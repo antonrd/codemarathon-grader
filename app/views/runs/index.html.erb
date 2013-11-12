@@ -1,0 +1,14 @@
+<table>
+  <% @runs.each do |run| %>
+    <tr>
+      <td><%= run.id %></td>
+      <td><%= run.task.name if !run.task.nil? %></td>
+      <td><%= run.status %></td>
+      <td><%= run.code %></td>
+      <td><%= run.message %></td>
+      <td><%= run.data %></td>
+      <td><%= run.log %></td>
+      <td><%= run.created_at.to_formatted_s(:short) %></td>
+    </tr>
+  <% end %>
+</table>

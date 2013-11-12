@@ -1,0 +1,13 @@
+development:
+  sync: cp
+  sync_to: /Users/pierrelombard/tmp/sets
+  run_cpp: ./program < %s > output
+  run_java: java program
+test:
+  sync: cp
+  sync_to: /Users/pierrelombard/tmp/sets
+  run_cpp: ./program < %s > output
+  run_java: java program
+production:
+  sync: rsync -azv -e ssh --delete
+  sync_to: sets
