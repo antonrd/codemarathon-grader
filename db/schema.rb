@@ -11,18 +11,20 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131017141132) do
+ActiveRecord::Schema.define(:version => 20131117121158) do
 
   create_table "runs", :force => true do |t|
     t.integer  "user_id"
     t.integer  "task_id"
-    t.string   "status",     :limit => 32
-    t.datetime "created_at",                 :null => false
-    t.datetime "updated_at",                 :null => false
+    t.string   "status",        :limit => 32
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
     t.string   "code"
-    t.string   "message",    :limit => 2048
+    t.string   "message",       :limit => 2048
     t.text     "data"
     t.text     "log"
+    t.integer  "max_memory_kb"
+    t.integer  "max_time_ms"
   end
 
   create_table "tasks", :force => true do |t|

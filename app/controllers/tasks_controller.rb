@@ -6,7 +6,8 @@ class TasksController < ApplicationController
   def create
     @user = User.find_by_email(params[:email])
     if @user.nil?
-      render inline: "Invalid user email specified."
+      render inline: {status: 1, 
+        message: "Invalid user email specified."}.to_json
       return
     end
 

@@ -14,7 +14,8 @@ class Run < ActiveRecord::Base
 
   include Constants
 
-  attr_accessible :status, :task_id, :user_id, :code, :message, :data, :log
+  attr_accessible :status, :task_id, :user_id, :code, :message, :data, 
+                  :log, :max_memory_kb, :max_time_ms
   validates :task_id, presence: true
 
   scope :latest_first, order('created_at desc')
