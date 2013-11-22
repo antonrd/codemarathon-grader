@@ -1,13 +1,17 @@
 development:
   sync: cp
-  sync_to: /Users/pierrelombard/tmp/sets
+  files_root: /Users/pierrelombard/tmp
+  sync_to: sets
+  runs_dir: runs
   run_cpp: ./program < %s > output
-  run_java: java program
+  run_java: java program < %s > output
 test:
   sync: cp
-  sync_to: /Users/pierrelombard/tmp/sets
+  sync_to: sets
+  runs_dir: runs
+  files_root: /Users/pierrelombard/tmp
   run_cpp: ./program < %s > output
-  run_java: java program
+  run_java: java program < %s > output
 production:
   sync: rsync -azv -e ssh --delete
   sync_to: sets

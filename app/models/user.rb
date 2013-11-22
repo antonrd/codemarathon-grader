@@ -10,4 +10,5 @@ class User < ActiveRecord::Base
 
   has_many :tasks
   has_many :runs
+  has_one :api_key
 end

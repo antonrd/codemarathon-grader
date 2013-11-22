@@ -1,4 +1,6 @@
 TasksGrader::Application.routes.draw do
+  get "users/reset_token"
+
   devise_for :users, path_names: {sign_in: "login", sign_out: "logout"}
 
   root :to => 'tasks#index'

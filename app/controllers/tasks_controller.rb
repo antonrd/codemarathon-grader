@@ -1,4 +1,7 @@
 class TasksController < ApplicationController
+
+  before_filter :restrict_access, except: [:index]
+
   def index
     @tasks = current_user.tasks
   end

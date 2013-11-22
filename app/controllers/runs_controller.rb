@@ -1,4 +1,6 @@
 class RunsController < ApplicationController
+  before_filter :restrict_access, except: [:index]
+
   def index
     @runs = current_user.runs.latest_first
   end

@@ -78,7 +78,7 @@ class Grader
   end
 
   def update_checker(run)
-    Dir.chdir(File.join(@config[:sync_to], run.task_id.to_s)) do
+    Dir.chdir(File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s)) do
       File.open("grader.log", "w") do |f|
         data = ActiveSupport::JSON.decode(run.data)
         if data["source_code"].empty?
@@ -100,7 +100,7 @@ class Grader
   def process_task_update(run)
     puts 'Update task run: %d' % run.id
     from = File.join(run.user.file_path, run.data.to_s, '*')
-    to = File.join(@config[:sync_to], run.task_id.to_s)
+    to = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s)
     FileUtils.mkdir_p(to)
     puts "Removing %s" % File.join(to, '*')
     FileUtils.rm(Dir.glob(File.join(to, '*')))
@@ -117,7 +117,10 @@ class Grader
     puts 'Grade task run: %d' % run.id
     data = ActiveSupport::JSON.decode(run.data)
     puts data
-    Dir.chdir '/Users/pierrelombard/tmp' do
+    run_dir = File.join(@config[:files_root], @config[:runs_dir], run.id.to_s)
+    FileUtils.mkdir_p(run_dir)
+    FileUtils.rm(Dir.glob(File.join(run_dir, '*')))
+    Dir.chdir(run_dir) do
       File.open("grader.log", "w") do |f|
         f.sync = true
         puts 'here'
@@ -131,10 +134,10 @@ class Grader
                 message: 'Compilation error', 
                 log: File.read("grader.log"))
             else
-              input_file_pat = File.join(@config[:sync_to], run.task_id.to_s, 'input.*.txt')
+              input_file_pat = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'input.*.txt')
               # puts input_file_pat
               input_files = Dir.glob(input_file_pat)
-              output_file_pat = File.join(@config[:sync_to], run.task_id.to_s, 'solve.*.txt')
+              output_file_pat = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'solve.*.txt')
               output_files = Dir.glob(output_file_pat)
               # puts input_files
               # puts output_files
@@ -153,6 +156,8 @@ class Grader
         end
       end
     end
+    # Remove the directory after the execution.
+    FileUtils.rm_rf(run_dir)
   end
   
   private

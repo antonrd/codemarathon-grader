@@ -1,5 +1,17 @@
 <h2>Edit <%= resource_name.to_s.humanize %></h2>
 
+<div>
+  <% if current_user.api_key.nil? || current_user.api_key.access_token.nil? %>
+    No API token yet.
+  <% else %>
+    <b>API token:</b> <%= current_user.api_key.access_token %>
+  <% end %>
+</div>
+
+<div style="margin-bottom: 30px;">
+  <%= link_to 'Reset token', users_reset_token_path %>
+</div>
+
 <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :method => :put }) do |f| %>
   <%= devise_error_messages! %>
 
