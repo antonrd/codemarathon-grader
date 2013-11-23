@@ -1,15 +1,20 @@
 development:
-  sync: cp
-  files_root: /Users/pierrelombard/tmp
+  sync: rsync -azv -e ssh pierrelombard@192.168.1.101
+  # files_root: /Users/pierrelombard/tmp
+  files_root:/home/vagrant/grader_root
   sync_to: sets
   runs_dir: runs
-  run_cpp: ./program < %s > output
-  run_java: java program < %s > output
+  # run_cpp: ./program < %s > output
+  # run_java: java program < %s > output
+  compile_cpp: g++ %s.cpp -o %s -O2
+  compile_java: gcj --main=program %s.java -o %s
+  run_cpp: sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program /tmp/box/0/box; sudo ~/moe_sandbox/run/bin/isolate --mem=70000 --time=1 --meta metadata.txt --stdin=%s --stdout=output --run -- program; sudo ~/moe_sandbox/run/bin/isolate --cleanup
+  run_java: sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program /tmp/box/0/box; sudo ~/moe_sandbox/run/bin/isolate --mem=70000 --time=1 --meta metadata.txt --stdin=%s --stdout=output --run -- program; sudo ~/moe_sandbox/run/bin/isolate --cleanup
 test:
   sync: cp
+  files_root: /Users/pierrelombard/tmp
   sync_to: sets
   runs_dir: runs
-  files_root: /Users/pierrelombard/tmp
   run_cpp: ./program < %s > output
   run_java: java program < %s > output
 production:

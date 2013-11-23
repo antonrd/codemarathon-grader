@@ -171,7 +171,7 @@ class Grader
         
         puts "Compiling C++ ..."
         # verbose_system "g++ program.cpp -o program -O2 -static -lm -x c++"
-        verbose_system "g++ %s.cpp -o %s -O2" % [file_name, file_name]
+        verbose_system @config[:compile_cpp] % [file_name, file_name]
       elsif language == 'java'
         File.open("%s.java" % [file_name], "w") do |f|
           f.write(source_code)
@@ -179,7 +179,7 @@ class Grader
         
         puts "Compiling Java ..."
         # verbose_system "g++ program.cpp -o program -O2 -static -lm -x c++"
-        verbose_system "javac %s.java" % [file_name]
+        verbose_system @config[:compile_java] % [file_name, file_name]
       end
 
       if $?.nil?
@@ -229,7 +229,7 @@ class Grader
     
     def check_output(run, answer_file, input_file)
       if run.task.checker
-        checker = File.join(@config[:sync_to], run.task_id.to_s, 'checker')
+        checker = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'checker')
         verbose_system "#{checker} #{input_file} #{answer_file} output"
       else
         checker = "ruby " + Rails.root.join("lib/execs/diff.rb").to_s
