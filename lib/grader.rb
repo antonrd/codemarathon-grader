@@ -197,16 +197,16 @@ class Grader
         # verbose_system "./program < #{input_file} > output"
         base_name = Pathname.new(input_file).basename
         if language == 'c++'
-          run_one_test(input_file, base_name, "cpp")
+          run_one_test(input_file, answer_file, base_name, "cpp")
         elsif language == 'java'
-          run_one_test(input_file, base_name, "java")
+          run_one_test(input_file, answer_file, base_name, "java")
         end
       }.join(" ")
     end
 
-    def run_one_test(input_file, base_name, config_lang)
+    def run_one_test(input_file, answer_file, base_name, config_lang)
       verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
-      verbose_system(@config["run_#{config_lang}".to_sym] % [basename])
+      verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
 
       result = "n/a"
       case $?.exitstatus
