@@ -166,6 +166,7 @@ class Grader
   private
     
     def compile(source_code, language, file_name = "program")
+      puts "==== GRADER ==== Start compiling ===="
       if language == 'c++'
         # puts "Create file " + ("%.cpp" % [file_name])
         File.open("%s.cpp" % [file_name], "w") do |f|
@@ -184,6 +185,8 @@ class Grader
         # verbose_system "g++ program.cpp -o program -O2 -static -lm -x c++"
         verbose_system @config[:compile_java] % [file_name, file_name]
       end
+
+      puts "==== GRADER ==== End compiling ===="
 
       if $?.nil?
         return false
@@ -214,8 +217,10 @@ class Grader
       result = "n/a"
       run_status = $?.exitstatus
       
+      puts "==== GRADER ==== Start cleanup"
       dir_name = Pathname.new(input_file).dirname
       verbose_system(@config["cleanup_#{config_lang}".to_sym])
+      puts "==== GRADER ==== End cleanup"
 
       case run_status
         when 9
@@ -223,7 +228,6 @@ class Grader
         when 127
           result = "ml"
         when 0
-          puts "Status 0 and checking..."
           result = check_output(run, answer_file, input_file)
         else
           result = "re"
