@@ -9,7 +9,7 @@
       <td><%= run.max_memory_kb %></td>
       <td><%= run.max_time_ms %></td>
       <td><%= run.data %></td>
-      <td><%= run.log %></td>
+      <td><pre><%= run.log %></pre></td>
       <td><%= run.created_at.to_formatted_s(:short) %></td>
     </tr>
   <% end %>
