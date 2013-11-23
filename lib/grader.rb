@@ -195,24 +195,34 @@ class Grader
       input_files.zip(output_files).map { |input_file, answer_file|
         # verbose_system "#{@runner} --user #{@user} --time #{run.problem.time_limit.to_f} --mem #{run.problem.memory_limit} --procs 1 -i #{input_file} -o output -- ./program"
         # verbose_system "./program < #{input_file} > output"
-        basename = Pathname.new(input_file).basename
+        base_name = Pathname.new(input_file).basename
         if language == 'c++'
-          verbose_system(@config[:run_cpp] % [input_file, basename])
+          run_one_test(input_file, base_name, "cpp")
         elsif language == 'java'
-          verbose_system(@config[:run_java] % [input_file, basename])
-        end
-
-        case $?.exitstatus
-          when 9
-            "tl"
-          when 127
-            "ml"
-          when 0
-            check_output(run, answer_file, input_file)
-          else
-            "re"
+          run_one_test(input_file, base_name, "java")
         end
       }.join(" ")
+    end
+
+    def run_one_test(input_file, base_name, config_lang)
+      verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
+      verbose_system(@config["run_#{config_lang}".to_sym] % [basename])
+
+      result = "n/a"
+      case $?.exitstatus
+        when 9
+          result = "tl"
+        when 127
+          result = "ml"
+        when 0
+          result = check_output(run, answer_file, input_file)
+        else
+          result = "re"
+      end
+
+      verbose_system(@config["cleanup_#{config_lang}".to_sym])
+
+      return result
     end
 
     def sync_tests(update_time)
