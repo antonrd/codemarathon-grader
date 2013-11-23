@@ -125,6 +125,7 @@ class Grader
       File.open("grader.log", "w") do |f|
         f.sync = true
         puts 'here'
+        #debugger
         self.class.with_stdout_and_stderr(f, f) do
           puts "Running process..."
           run.update_attributes(status: Run::STATUS_RUNNING,
@@ -142,6 +143,7 @@ class Grader
               output_files = Dir.glob(output_file_pat)
               # puts input_files
               # puts output_files
+              #debugger
               puts "Running tests..."
               status = run_tests(run, input_files, output_files, data["lang"])
 
@@ -197,30 +199,35 @@ class Grader
         # verbose_system "./program < #{input_file} > output"
         base_name = Pathname.new(input_file).basename
         if language == 'c++'
-          run_one_test(input_file, answer_file, base_name, "cpp")
+          run_one_test(run, input_file, answer_file, "cpp")
         elsif language == 'java'
-          run_one_test(input_file, answer_file, base_name, "java")
+          run_one_test(run, input_file, answer_file, "java")
         end
       }.join(" ")
     end
 
-    def run_one_test(input_file, answer_file, base_name, config_lang)
+    def run_one_test(run, input_file, answer_file, config_lang)
+      base_name = Pathname.new(input_file).basename
       verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
       verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
 
       result = "n/a"
-      case $?.exitstatus
+      run_status = $?.exitstatus
+      
+      dir_name = Pathname.new(input_file).dirname
+      verbose_system(@config["cleanup_#{config_lang}".to_sym])
+
+      case run_status
         when 9
           result = "tl"
         when 127
           result = "ml"
         when 0
+          puts "Status 0 and checking..."
           result = check_output(run, answer_file, input_file)
         else
           result = "re"
       end
-
-      verbose_system(@config["cleanup_#{config_lang}".to_sym])
 
       return result
     end
@@ -240,6 +247,7 @@ class Grader
     end
     
     def check_output(run, answer_file, input_file)
+      puts "Checking output..."
       if run.task.checker
         checker = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'checker')
         verbose_system "#{checker} #{input_file} #{answer_file} output"
