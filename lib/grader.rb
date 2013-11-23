@@ -3,6 +3,7 @@ require "shell_utils"
 require "sets_sync"
 
 require 'fileutils'
+require 'pathname'
 
 class Grader
   include ShellUtils
@@ -194,10 +195,11 @@ class Grader
       input_files.zip(output_files).map { |input_file, answer_file|
         # verbose_system "#{@runner} --user #{@user} --time #{run.problem.time_limit.to_f} --mem #{run.problem.memory_limit} --procs 1 -i #{input_file} -o output -- ./program"
         # verbose_system "./program < #{input_file} > output"
+        basename = Pathname.new(input_file).basename
         if language == 'c++'
-          verbose_system(@config[:run_cpp] % input_file)
+          verbose_system(@config[:run_cpp] % [input_file, basename])
         elsif language == 'java'
-          verbose_system(@config[:run_java] % input_file)
+          verbose_system(@config[:run_java] % [input_file, basename])
         end
 
         case $?.exitstatus
