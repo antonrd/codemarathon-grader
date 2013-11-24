@@ -18,12 +18,13 @@ puts cmd
 system cmd
 puts "status: #{$?.exitstatus}"
 
-if status["status"] == "SG"
+memory_limit = false
+if status["status"] == "SG" || status["status"] == "RE"
   File.open(opt.output, "r") do |f|
     f.each_line do |line|
-      memory_limit ||= line =~ /Out of memory/
-      memory_limit ||= line =~ /Cannot allocate memory/
-      memory_limit ||= line =~ /std::bad_alloc/
+      memory_limit ||= line =~ /Out of memory/i
+      memory_limit ||= line =~ /Cannot allocate memory/i
+      memory_limit ||= line =~ /std::bad_alloc/i
       break;
     end
   end
