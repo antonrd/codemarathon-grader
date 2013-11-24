@@ -1,4 +1,3 @@
-# -*- encoding : utf-8 -*-
 #!/usr/bin/env ruby
 # Runs a process with some resource limitations
 # Spacial status codes:
@@ -8,11 +7,16 @@ require File.dirname(__FILE__) + "/runner_args.rb"
 
 opt = Options.new
 
-box = File.expand_path(File.dirname(__FILE__) + "../sandboxes/isolate")
-%x{#{box} --time=#{opt.timelimit / 1000.0} --wall-time=#{opt.timelimit / 100.0} --mem=#{opt.mem} -M stat --stdin=#{opt.input} --stdout=#{opt.output} --run -- #{opt.cmd}}
+box = File.join(File.dirname(__FILE__), "../sandboxes/isolate")
+%x{sudo #{box} --time=#{opt.timelimit / 1000.0} --wall-time=#{opt.timelimit / 100.0} --mem=#{opt.mem} -M stat --stdin=#{opt.input} --stdout=#{opt.output} --run -- #{opt.cmd}}
 status = File.read("stat").lines.inject({}) { |h, l| k, v = l.strip.split(":"); h[k] = v; h; }
 
-$stderr.puts "Used time: #{status["time"] * 1000.0}"
+$stderr.puts "Used time: #{status["time"]}"
+
+cmd = "sudo cp /tmp/box/0/box/output ."
+puts cmd
+system cmd
+puts "status: #{$?.exitstatus}"
 
 memory_limit = status["status"] == "SG"
 File.open(opt.output, "r") do |f|

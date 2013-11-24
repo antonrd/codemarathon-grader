@@ -9,9 +9,9 @@ development:
   compile_cpp: g++ %s.cpp -o %s -O2
   compile_java: gcj --main=program %s.java -o %s
   runner: isolate_runner.rb
-  init_cpp: sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
+  init_cpp: sudo rm -f output; sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
   # run_cpp: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
-  cleanup_cpp: cat metadata.txt; sudo cp /tmp/box/0/box/output .; sudo ~/moe_sandbox/run/bin/isolate --cleanup
+  cleanup_cpp: cat stat; sudo cp /tmp/box/0/box/output .; cat output; sudo ~/moe_sandbox/run/bin/isolate --cleanup
   init_java: sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
   # run_java: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
   cleanup_java: cat metadata.txt; sudo cp /tmp/box/0/box/output .; sudo ~/moe_sandbox/run/bin/isolate --cleanup
