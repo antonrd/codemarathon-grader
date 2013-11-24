@@ -198,8 +198,6 @@ class Grader
     def run_tests(run, input_files, output_files, language)
       # for each test, run the program
       input_files.zip(output_files).map { |input_file, answer_file|
-        # verbose_system "#{@runner} --user #{@user} --time #{run.problem.time_limit.to_f} --mem #{run.problem.memory_limit} --procs 1 -i #{input_file} -o output -- ./program"
-        # verbose_system "./program < #{input_file} > output"
         base_name = Pathname.new(input_file).basename
         if language == 'c++'
           run_one_test(run, input_file, answer_file, "cpp")
@@ -211,16 +209,19 @@ class Grader
 
     def run_one_test(run, input_file, answer_file, config_lang)
       base_name = Pathname.new(input_file).basename
-      verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
-      verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
+      # verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
+      # verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
+      
+      # puts "==== GRADER ==== Start cleanup"
+      # dir_name = Pathname.new(input_file).dirname
+      # verbose_system(@config["cleanup_#{config_lang}".to_sym])
+      # puts "==== GRADER ==== End cleanup"
+
+      runner = Pathname.new(File.join(File.dirname(__FILE__), @config[:runner])).realpath.to_s
+      verbose_system "#{runner} --time #{run.problem.time_limit.to_f} --mem #{run.problem.memory_limit} --procs 1 -i #{input_file} -o output -- ./program"
 
       result = "n/a"
       run_status = $?.exitstatus
-      
-      puts "==== GRADER ==== Start cleanup"
-      dir_name = Pathname.new(input_file).dirname
-      verbose_system(@config["cleanup_#{config_lang}".to_sym])
-      puts "==== GRADER ==== End cleanup"
 
       case run_status
         when 9

@@ -8,12 +8,13 @@ development:
   # run_java: java program < %s > output
   compile_cpp: g++ %s.cpp -o %s -O2
   compile_java: gcj --main=program %s.java -o %s
-  init_cpp: sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
-  run_cpp: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
-  cleanup_cpp: cat metadata.txt; sudo cp /tmp/box/0/box/output .; sudo ~/moe_sandbox/run/bin/isolate --cleanup
-  init_java: sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
-  run_java: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
-  cleanup_java: cat metadata.txt; sudo cp /tmp/box/0/box/output .; sudo ~/moe_sandbox/run/bin/isolate --cleanup
+  runner: box_runner.rb
+  # init_cpp: sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
+  # run_cpp: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
+  # cleanup_cpp: cat metadata.txt; sudo cp /tmp/box/0/box/output .; sudo ~/moe_sandbox/run/bin/isolate --cleanup
+  # init_java: sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
+  # run_java: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
+  # cleanup_java: cat metadata.txt; sudo cp /tmp/box/0/box/output .; sudo ~/moe_sandbox/run/bin/isolate --cleanup
 test:
   sync: cp
   files_root: /Users/pierrelombard/tmp
