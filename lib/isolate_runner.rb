@@ -14,11 +14,14 @@ status = File.read("stat").lines.inject({}) { |h, l| k, v = l.strip.split(":"); 
 
 $stderr.puts "Used time: #{status["time"] * 1000.0}"
 
-memory_limit = status["status"] == "SG"
-File.open(opt.output, "r") do |f|
-  f.each_line do |line|
-    memory_limit ||= line =~ /Out of memory/
-    break;
+if status["status"] == "SG"
+  File.open(opt.output, "r") do |f|
+    f.each_line do |line|
+      memory_limit ||= line =~ /Out of memory/
+      memory_limit ||= line =~ /Cannot allocate memory/
+      memory_limit ||= line =~ /std::bad_alloc/
+      break;
+    end
   end
 end
 
@@ -30,4 +33,16 @@ end
 
 exit 9 if status["status"] == "TO"
 exit 127 if memory_limit
+
+if status.has_key?("exitsig")
+  exit_sig = status["exitsig"].to_i
+  exit 1
+end
+
+if status.has_key?("killed")
+  exit 9 if status["killed"].to_i == 1
+end
+
+exit 1 if status["status"] == "RE"
+
 exit $?.exitstatus
