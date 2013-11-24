@@ -160,7 +160,7 @@ class Grader
       end
     end
     # Remove the directory after the execution.
-    FileUtils.rm_rf(run_dir)
+    # FileUtils.rm_rf(run_dir)
   end
   
   private
