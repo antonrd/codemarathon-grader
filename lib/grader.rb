@@ -218,7 +218,7 @@ class Grader
       # puts "==== GRADER ==== End cleanup"
 
       runner = Pathname.new(File.join(File.dirname(__FILE__), @config[:runner])).realpath.to_s
-      verbose_system "#{runner} --time #{run.problem.time_limit.to_f} --mem #{run.problem.memory_limit} --procs 1 -i #{input_file} -o output -- ./program"
+      verbose_system "#{runner} --time #{run.max_time_ms} --mem #{run.max_memory_kb} --procs 1 -i #{input_file} -o output -- ./program"
 
       result = "n/a"
       run_status = $?.exitstatus
