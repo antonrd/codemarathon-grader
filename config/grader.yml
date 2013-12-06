@@ -23,5 +23,19 @@ test:
   run_cpp: ./program < %s > output
   run_java: java program < %s > output
 production:
-  sync: rsync -azv -e ssh --delete
+  sync: rsync -azv -e ssh
+  # files_root: /Users/pierrelombard/tmp
+  files_root: /home/deployer/grader_root
   sync_to: sets
+  runs_dir: runs
+  # run_cpp: ./program < %s > output
+  # run_java: java program < %s > output
+  compile_cpp: g++ %s.cpp -o %s -O2
+  compile_java: gcj --main=program %s.java -o %s
+  runner: isolate_runner.rb
+  init_cpp: sudo rm -f output; sudo /home/deployer/isolate --init; sudo cp program %s /tmp/box/0/box
+  # run_cpp: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
+  cleanup_cpp: cat stat; sudo cp /tmp/box/0/box/output .; head -2 output; sudo /home/deployer/isolate --cleanup
+  init_java: sudo rm -f output; sudo /home/deployer/isolate --init; sudo cp program %s /tmp/box/0/box
+  # run_java: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
+  cleanup_java: cat stat; sudo cp /tmp/box/0/box/output .; head -2 output; sudo /home/deployer/isolate --cleanup
