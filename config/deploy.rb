@@ -1,7 +1,7 @@
 require "bundler/capistrano"
 
 load "config/recipes/base"
-load "config/recipes/rbenv"
+# load "config/recipes/rbenv"
 load "config/recipes/check"
 
 server "176.58.110.176", :web, :app, :db, :production, primary: true
@@ -29,7 +29,16 @@ namespace :deploy do
    task command, roles: :app, except: {no_release: true} do
      run "/etc/init.d/unicorn_#{application} #{command}"
    end
-  end
+ end
+
+  # task :restart do
+  #   run "touch #{current_path}/tmp/restart.txt"
+  # end
+
+  # Define start/stop as no ops, as they are not supported by Passenger
+  # %w[:start, :stop].each do |task|
+  #   # Do nothing for those tasks.
+  # end
 
   task :setup_config, roles: :app do
     sudo "ln -nfs #{current_path}/config/nginx.conf /etc/nginx/sites-enabled/#{application}"
