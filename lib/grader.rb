@@ -124,7 +124,6 @@ class Grader
     Dir.chdir(run_dir) do
       File.open("grader.log", "w") do |f|
         f.sync = true
-        puts 'here'
         #debugger
         self.class.with_stdout_and_stderr(f, f) do
           puts "Running process..."
@@ -145,10 +144,10 @@ class Grader
               # puts output_files
               #debugger
               puts "Running tests..."
-              status = run_tests(run, input_files, output_files, data["lang"])
+              results = run_tests(run, input_files, output_files, data["lang"])
 
               run.update_attributes(status: Run::STATUS_SUCCESS, 
-                message: status, 
+                message: results, 
                 log: File.read("grader.log"))
             end
           else
@@ -196,6 +195,10 @@ class Grader
     end
     
     def run_tests(run, input_files, output_files, language)
+      if input_files.empty? || output_files.empty?
+        return "No tests"
+      end
+
       # for each test, run the program
       input_files.zip(output_files).map { |input_file, answer_file|
         base_name = Pathname.new(input_file).basename
