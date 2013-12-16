@@ -84,13 +84,16 @@ class Grader
         data = ActiveSupport::JSON.decode(run.data)
         if data["source_code"].empty?
           run.task.update_attribute(:checker, nil)
-          run.update_attribute(:status, Run::STATUS_SUCCESS)
+          run.update_attributes(status: Run::STATUS_SUCCESS,
+                                message: "Default checker set")
         else
           if compile(data["source_code"], data["lang"], "checker")
-            run.update_attribute(:status, Run::STATUS_SUCCESS)
+            run.update_attributes(status: Run::STATUS_SUCCESS,
+                                  message: "New checker set")
             run.task.update_attribute(:checker, data["lang"])
           else
             run.update_attributes(status: Run::STATUS_CE,
+                                  message: "Compilation error",
                                   log: File.read("grader.log"))
           end
         end
