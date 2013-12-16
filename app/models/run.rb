@@ -24,6 +24,7 @@ class Run < ActiveRecord::Base
 
   before_create do
     self.status = STATUS_PENDING if self.status.blank?
+    self.message = "Pending" if self.message.blank?
   end
 
   belongs_to :user

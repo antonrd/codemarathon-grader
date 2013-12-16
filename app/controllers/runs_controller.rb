@@ -55,7 +55,10 @@ class RunsController < ApplicationController
     if @run.nil?
       render inline: {status: 1, message: "Invalid run ID specified."}.to_json
     else
-      render inline: {status: 0, run_status: @run.status, run_message: @run.message, run_log: @run.log}.to_json
+      render inline: {status: 0, 
+                      run_status: @run.status, 
+                      run_message: @run.message, 
+                      run_log: @run.log}.to_json
     end
   end
 end
