@@ -1,5 +1,5 @@
 development:
-  sync: rsync -azv -e ssh pierrelombard@192.168.1.101
+  sync: rsync -azv -e ssh pierrelombard@192.168.1.101:%s %s
   # files_root: /Users/pierrelombard/tmp
   files_root: /home/vagrant/grader_root
   sync_to: sets
@@ -23,7 +23,7 @@ test:
   run_cpp: ./program < %s > output
   run_java: java program < %s > output
 production:
-  sync: rsync -azv -e ssh
+  sync: rsync -azv -e ssh %s %s
   # files_root: /Users/pierrelombard/tmp
   files_root: /home/deployer/grader_root
   sync_to: sets
