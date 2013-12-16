@@ -106,7 +106,7 @@ class Grader
     puts "Removing %s" % File.join(to, '*')
     FileUtils.rm(Dir.glob(File.join(to, '*')))
     puts "Syncing tests from #{from} to #{to}"
-    sync_command = @config[:sync] % "#{from} #{to}"
+    sync_command = @config[:sync] % [from, to]
     if verbose_system sync_command
       run.update_attribute(:status, Run::STATUS_SUCCESS)
     else
