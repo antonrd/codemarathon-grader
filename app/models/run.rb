@@ -5,10 +5,12 @@ class Run < ActiveRecord::Base
     CODE_RUN_TASK = "run_task"
     CODE_UPDATE_CHECKER = "update_checker"
 
+    STATUS_STARTING = "starting"
     STATUS_PENDING = "pending"
     STATUS_RUNNING = "running"
-    STATUS_CE = "comp_error"
-    STATUS_ERROR = "unknown_error"
+    STATUS_CE = "compilation error"
+    STATUS_ERROR = "unknown error"
+    STATUS_GRADER_ERROR = "grader error"
     STATUS_SUCCESS = "success"
   end
 
