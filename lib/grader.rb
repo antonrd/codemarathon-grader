@@ -140,9 +140,9 @@ class Grader
             else
               input_file_pat = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'input.*.txt')
               # puts input_file_pat
-              input_files = Dir.glob(input_file_pat)
+              input_files = Dir.glob(input_file_pat).sort
               output_file_pat = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'solve.*.txt')
-              output_files = Dir.glob(output_file_pat)
+              output_files = Dir.glob(output_file_pat).sort
               # puts input_files
               # puts output_files
               #debugger
