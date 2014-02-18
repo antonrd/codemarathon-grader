@@ -226,7 +226,7 @@ class Grader
       verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
       # verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
 
-      runner = Pathname.new(File.join(File.dirname(__FILE__), @config[:runner])).realpath.to_s
+      runner = Pathname.new(File.join(File.dirname(__FILE__), @config["runner_#{config_lang}"])).realpath.to_s
       if config_lang == 'python'
         verbose_system "#{runner} --time #{run.max_time_ms} --mem #{run.max_memory_kb} --procs 1 -i #{base_name} -o output -- ./program.py"
       else

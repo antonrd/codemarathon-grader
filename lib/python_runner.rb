@@ -29,11 +29,13 @@ rescue => err
 end
 
 if status != 0
-  exit 9 if time_sec >= opt.timelimit / 1000.0
+  exit 9 if time_sec >= opt.timelimit / 1000.0 || status == 137
   exit 127 if memory_kb >= opt.mem
   exit 127 if !/MemoryError/.match(error_msg).nil?
+  exit 127 if !/Cannot allocate memory/.match(error_msg).nil?
+  exit 127 if status == -9 || status == -11
   exit 1
 else
   $stderr.puts "Used time: #{time_sec}"
-  $stderr.puts "User mem: #{memory_kb}"
+  $stderr.puts "Used mem: #{memory_kb}"
 end
