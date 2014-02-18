@@ -34,6 +34,7 @@ rescue => err
 end
 
 if status != 0
+  $stderr.puts error_msg
   exit 9 if time_sec >= opt.timelimit / 1000.0 || status == 137
   exit 127 if memory_kb >= opt.mem
   exit 127 if !/MemoryError/.match(error_msg).nil?
