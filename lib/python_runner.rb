@@ -18,11 +18,11 @@ error_msg = ""
 begin
   File.open("stat", "r") do |infile|
     line1 = infile.gets
-    time_sec = line1.strip.split(":")[1].strip
+    time_sec = line1.strip.split(":")[1].strip.to_f
     line2 = infile.gets
-    memory_kb = line2.strip.split(":")[1].strip
+    memory_kb = line2.strip.split(":")[1].strip.to_i
     line3 = infile.gets
-    status = line3.strip.split(":")[1].strip
+    status = line3.strip.split(":")[1].strip.to_i
     error_msg = ""
     while (line = infile.gets)
       error_msg += line
