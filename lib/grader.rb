@@ -223,9 +223,7 @@ class Grader
 
     def run_one_test(run, input_file, answer_file, config_lang)
       base_name = Pathname.new(input_file).basename
-      if config_lang != "python"
-        verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
-      end
+      verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
       # verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
 
       runner = Pathname.new(File.join(File.dirname(__FILE__), @config["runner_#{config_lang}"])).realpath.to_s
