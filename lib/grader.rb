@@ -132,7 +132,7 @@ class Grader
           puts "Running process..."
           run.update_attributes(status: Run::STATUS_RUNNING,
                                 message: "Running")
-          if data["lang"] == 'c++' || data["lang"] == 'java'
+          if ['c++', 'java', 'python'].include?(data["lang"])
             if !compile(data["source_code"], data["lang"])
               run.update_attributes(status: Run::STATUS_CE, 
                 message: 'Compilation error', 
@@ -152,7 +152,7 @@ class Grader
               run.update_attributes(status: Run::STATUS_SUCCESS, 
                 message: results, 
                 log: File.read("grader.log"))
-            end
+            end        
           else
             run.update_attributes(status: Run::STATUS_ERROR, 
               message: 'Unknown language', 
@@ -186,6 +186,12 @@ class Grader
         puts "Compiling Java ..."
         # verbose_system "g++ program.cpp -o program -O2 -static -lm -x c++"
         verbose_system @config[:compile_java] % [file_name, file_name]
+      elsif language == 'python'
+        # Python is not compiled, just the source file is created here.
+        File.open("%s.py" % [file_name], "w") do |f|
+          f.write(source_code)
+        end
+        true
       end
 
       puts "==== GRADER ==== End compiling ===="
@@ -209,6 +215,8 @@ class Grader
           run_one_test(run, input_file, answer_file, "cpp")
         elsif language == 'java'
           run_one_test(run, input_file, answer_file, "java")
+        elsif language == 'python'
+          run_one_test(run, input_file, answer_file, "python")
         end
       }.join(" ")
     end
@@ -219,7 +227,11 @@ class Grader
       # verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
 
       runner = Pathname.new(File.join(File.dirname(__FILE__), @config[:runner])).realpath.to_s
-      verbose_system "#{runner} --time #{run.max_time_ms} --mem #{run.max_memory_kb} --procs 1 -i #{base_name} -o output -- ./program"
+      if config_lang == 'python'
+        verbose_system "#{runner} --time #{run.max_time_ms} --mem #{run.max_memory_kb} --procs 1 -i #{base_name} -o output -- ./program.py"
+      else
+        verbose_system "#{runner} --time #{run.max_time_ms} --mem #{run.max_memory_kb} --procs 1 -i #{base_name} -o output -- ./program"
+      end
       result = "n/a"
       run_status = $?.exitstatus
       

@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# Runs a process with some resource limitations
+# Spacial status codes:
+# 127 - memory limit
+# 9 - time limit
+require File.dirname(__FILE__) + "/runner_args.rb"
+
+opt = Options.new
+
+box = File.join(File.dirname(__FILE__), "../sandboxes/python_box.py")
+%x{python #{box} /home/vagrant/install_tests/codejail/scodejail/bin/python sandbox #{opt.timelimit / 1000.0} #{opt.timelimit / 100.0} #{opt.mem} #{opt.input} #{opt.cmd} #{opt.output}}
+
+begin
+  File.open("stat", "r") do |infile|
+    line1 = infile.gets
+    time_sec = line1.strip.split(":")[1].strip
+    line2 = infile.gets
+    memory_kb = line2.strip.split(":")[1].strip
+    line3 = infile.gets
+    status = line3.strip.split(":")[1].strip
+    error_msg = ""
+    while (line = infile.gets)
+      error_msg += line
+    end
+  end
+rescue => err
+  puts "Exception: #{err}"
+  err
+end
+
+if status != 0
+  exit 9 if time_sec >= opt.timelimit / 1000.0
+  exit 127 if memory_kb >= opt.mem
+  exit 127 if !/MemoryError/.match(error_msg).nil?
+  exit 1
+else
+  $stderr.puts "Used time: #{time_sec}"
+  $stderr.puts "User mem: #{memory_kb}"
+end
