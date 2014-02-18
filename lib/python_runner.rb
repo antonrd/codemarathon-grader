@@ -8,7 +8,7 @@ require File.dirname(__FILE__) + "/runner_args.rb"
 opt = Options.new
 
 box = File.join(File.dirname(__FILE__), "../sandboxes/python_box.py")
-%x{python #{box} /home/vagrant/install_tests/codejail/scodejail/bin/python sandbox #{opt.timelimit / 1000.0} #{opt.timelimit / 100.0} #{opt.mem} #{opt.input} #{opt.cmd} #{opt.output}}
+%x{python #{box} /home/vagrant/install_tests/codejail/scodejail/bin/python sandbox #{opt.timelimit / 1000.0} #{opt.timelimit / 100.0} #{opt.mem * 1000} #{opt.input} #{opt.cmd} #{opt.output}}
 
 status = -1000
 time_sec = 0
@@ -33,6 +33,9 @@ rescue => err
   err
 end
 
+$stderr.puts "Used time: #{time_sec}"
+$stderr.puts "Used mem: #{memory_kb}"
+
 if status != 0
   $stderr.puts error_msg
   exit 9 if time_sec >= opt.timelimit / 1000.0 || status == 137
@@ -41,7 +44,4 @@ if status != 0
   exit 127 if !/Cannot allocate memory/.match(error_msg).nil?
   exit 127 if status == -9 || status == -11
   exit 1
-else
-  $stderr.puts "Used time: #{time_sec}"
-  $stderr.puts "Used mem: #{memory_kb}"
 end
