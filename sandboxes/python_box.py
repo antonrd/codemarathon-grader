@@ -58,4 +58,4 @@ with open("stat", "w") as f:
   f.write("Time: %f\n" % cpu_time)
   f.write("Memory: %d\n" % memory_usage)
   f.write("Status: %d\n" % status)
-  f.write("Error: %s\n" % error_message)
+  f.write("==== STDERR contents BEGIN ====\n%s\n==== STDERR contents END" % error_message)

@@ -228,9 +228,16 @@ class Grader
 
       runner = Pathname.new(File.join(File.dirname(__FILE__), @config["runner_#{config_lang}"])).realpath.to_s
       if config_lang == 'python'
-        verbose_system "#{runner} --time #{run.max_time_ms} --mem #{run.max_memory_kb} --procs 1 -i #{base_name} -o output -- ./program.py"
+        verbose_system "#{runner} --time #{run.max_time_ms} "\
+                       "--mem #{run.max_memory_kb} --procs 1 "\
+                       "--python #{@config[:python_exec]} "\
+                       "--sandbox-user #{@config[:python_sandbox_user]} "\
+                       "-i #{base_name} -o output "\
+                       "-- ./program.py"
       else
-        verbose_system "#{runner} --time #{run.max_time_ms} --mem #{run.max_memory_kb} --procs 1 -i #{base_name} -o output -- ./program"
+        verbose_system "#{runner} --time #{run.max_time_ms} "\
+                       "--mem #{run.max_memory_kb} --procs 1 "\
+                       "-i #{base_name} -o output -- ./program"
       end
       result = "n/a"
       run_status = $?.exitstatus

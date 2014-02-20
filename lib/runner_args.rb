@@ -14,7 +14,9 @@ class Options
           [ '--procs', '-p', GetoptLong::OPTIONAL_ARGUMENT ],
           [ '--input', '-i', GetoptLong::REQUIRED_ARGUMENT ],
           [ '--output', '-o', GetoptLong::REQUIRED_ARGUMENT ],
-          [ '--user', '-u', GetoptLong::OPTIONAL_ARGUMENT ]
+          [ '--user', '-u', GetoptLong::OPTIONAL_ARGUMENT ],
+          [ '--sandbox-user', '-s', GetoptLong::OPTIONAL_ARGUMENT ],
+          [ '--python', '-y', GetoptLong::OPTIONAL_ARGUMENT ],
         )
 
     @mem = nil
@@ -22,6 +24,8 @@ class Options
     @proclimit = nil
     @user = nil
     @input, @output = nil, nil
+    @sandbox_user = nil
+    @python = nil
     opts.each do |opt, value|
       case opt
         when '--mem' then @mem = value.to_i
@@ -30,6 +34,8 @@ class Options
         when '--user' then @user = value
         when '--input' then @input = value
         when '--output' then @output = value
+        when '--sandbox-user' then @sandbox_user = value
+        when '--python' then @python = value
       end
     end
 

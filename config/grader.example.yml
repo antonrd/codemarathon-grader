@@ -16,6 +16,8 @@ development:
   init_java: sudo rm -f output; sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
   # run_java: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
   cleanup_java: cat stat; sudo cp /tmp/box/0/box/output .; head -2 output; sudo ~/moe_sandbox/run/bin/isolate --cleanup
+  python_exec: /home/deployer/codemarathon-sandbox/bin/python
+  python_sandbox_user: sandbox
 test:
   sync: cp
   files_root: /Users/pierrelombard/tmp
@@ -40,3 +42,5 @@ production:
   init_java: sudo rm -f output; sudo /home/deployer/isolate --init; sudo cp program %s /tmp/box/0/box
   # run_java: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
   cleanup_java: cat stat; sudo cp /tmp/box/0/box/output .; head -2 output; sudo /home/deployer/isolate --cleanup
+  python_exec: /home/deployer/codemarathon-sandbox/bin/python
+  python_sandbox_user: sandbox
