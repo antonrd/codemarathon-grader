@@ -1,0 +1,1 @@
+worker: rake grader:start RAILS_ENV=development
