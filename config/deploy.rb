@@ -24,12 +24,27 @@ ssh_options[:forward_agent] = true
 after "deploy", "deploy:cleanup" # keep only the last 5 releases
 
 namespace :deploy do
- %w[start stop restart].each do |command|
+  %w[start stop restart].each do |command|
    desc "#{command} unicorn server"
    task command, roles: :app, except: {no_release: true} do
      run "/etc/init.d/unicorn_#{application} #{command}"
    end
- end
+  end
+
+  task :start_worker, roles: :app do
+    run "cd #{current_path}"
+    sudo "start tasks_grader"
+  end
+
+  task :stop_worker, roles: :app do
+    run "cd #{current_path}"
+    sudo "stop tasks_grader"
+  end
+
+  task :restart_worker, roles: :app do
+    run "cd #{current_path}"
+    sudo "restart tasks_grader"
+  end
 
   # task :restart do
   #   run "touch #{current_path}/tmp/restart.txt"
