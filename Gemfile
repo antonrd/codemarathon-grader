@@ -9,6 +9,8 @@ gem 'mysql2', '~> 0.3.11'
 gem 'json', '1.8.0'
 gem 'devise', '~> 3.0'
 
+gem "foreman", "~> 0.63.0"
+
 group :development, :test do
   gem 'debugger'
 end
