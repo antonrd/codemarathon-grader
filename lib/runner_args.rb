@@ -26,6 +26,7 @@ class Options
     @input, @output = nil, nil
     @sandbox_user = nil
     @python = nil
+    @unittest = nil
     opts.each do |opt, value|
       case opt
         when '--mem' then @mem = value.to_i
