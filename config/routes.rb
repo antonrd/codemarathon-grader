@@ -5,7 +5,12 @@ TasksGrader::Application.routes.draw do
 
   root :to => 'tasks#index'
 
-  resources :tasks
+  resources :tasks do
+    member do
+      post "update_task"
+    end
+  end
+
   resources :runs do
     member do
       post 'resubmit'

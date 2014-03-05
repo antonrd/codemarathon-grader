@@ -3,7 +3,7 @@ module ShellUtils
   def verbose_system(cmd)
     puts cmd
     system cmd
-    puts "status: #{$?.exitstatus}"
+    # puts "status: #{$?.exitstatus}"
   end
 
   def get_config
