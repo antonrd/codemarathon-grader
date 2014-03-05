@@ -5,7 +5,7 @@ require 'getoptlong'
 require 'etc'
 
 class Options
-  attr_accessor :mem, :timelimit, :proclimit, :user, :input, :output, :cmd, :python, :sandbox_user
+  attr_accessor :mem, :timelimit, :proclimit, :user, :input, :output, :cmd, :unittest, :python, :sandbox_user
   def initialize
     opts = GetoptLong.new(
           [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
@@ -45,5 +45,7 @@ class Options
     end
 
     @cmd = ARGV.shift
+    if ARGV.length > 0
+      @unittest = ARGV.shift
   end
 end

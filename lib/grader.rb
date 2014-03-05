@@ -146,6 +146,13 @@ class Grader
               # puts input_files
               # puts output_files
               #debugger
+
+              if run.task.task_type == Task::TASK_TYPE_PYUNIT
+                File.open("wrapper_code.py", "w") do |f|
+                  f.write(run.task.wrapper_code)
+                end
+              end
+
               puts "Running tests..."
               results = run_tests(run, input_files, output_files, data["lang"])
 
@@ -166,7 +173,6 @@ class Grader
   end
   
   private
-    
     def compile(source_code, language, file_name = "program")
       puts "==== GRADER ==== Start compiling ===="
       if language == 'c++'
@@ -227,17 +233,27 @@ class Grader
       # verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
 
       runner = Pathname.new(File.join(File.dirname(__FILE__), @config["runner_#{config_lang}"])).realpath.to_s
-      if config_lang == 'python'
-        verbose_system "#{runner} --time #{run.max_time_ms} "\
-                       "--mem #{run.max_memory_kb} --procs 1 "\
-                       "--python #{@config[:python_exec]} "\
-                       "--sandbox-user #{@config[:python_sandbox_user]} "\
-                       "-i #{base_name} -o output "\
-                       "-- ./program.py"
+
+      if run.task.task_type == Task::TASK_TYPE_PYUNIT
+          verbose_system "#{runner} --time #{run.max_time_ms} "\
+                         "--mem #{run.max_memory_kb} --procs 1 "\
+                         "--python #{@config[:python_exec]} "\
+                         "--sandbox-user #{@config[:python_sandbox_user]} "\
+                         "-i #{base_name} -o output "\
+                         "-- ./wrapper_code.py ./program.py"        
       else
-        verbose_system "#{runner} --time #{run.max_time_ms} "\
-                       "--mem #{run.max_memory_kb} --procs 1 "\
-                       "-i #{base_name} -o output -- ./program"
+        if config_lang == 'python'
+          verbose_system "#{runner} --time #{run.max_time_ms} "\
+                         "--mem #{run.max_memory_kb} --procs 1 "\
+                         "--python #{@config[:python_exec]} "\
+                         "--sandbox-user #{@config[:python_sandbox_user]} "\
+                         "-i #{base_name} -o output "\
+                         "-- ./program.py"
+        else
+          verbose_system "#{runner} --time #{run.max_time_ms} "\
+                         "--mem #{run.max_memory_kb} --procs 1 "\
+                         "-i #{base_name} -o output -- ./program"
+        end
       end
       result = "n/a"
       run_status = $?.exitstatus

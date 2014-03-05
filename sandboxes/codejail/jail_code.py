@@ -117,7 +117,7 @@ class JailResult(object):
 
 
 def jail_code(command, code=None, files=None, argv=None, stdin=None,
-              slug=None):
+              slug=None, unit_test_code=None):
     """
     Run code in a jailed subprocess.
 
@@ -183,8 +183,10 @@ def jail_code(command, code=None, files=None, argv=None, stdin=None,
         if code:
             with open(os.path.join(homedir, "jailed_code"), "w") as jailed:
                 jailed.write(code)
-
             argv = ["jailed_code"] + argv
+            if unit_test_code:
+                with open(os.path.join(homedir, "unit_test_code"), "w") as unit_test:
+                    unit_test.write(unit_test_code)
 
         cmd = []
 

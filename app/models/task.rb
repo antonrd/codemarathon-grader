@@ -1,6 +1,13 @@
 class Task < ActiveRecord::Base
-  attr_accessible :description, :name, :user_id
+  module Constants
+    TASK_TYPE_IOFILES = "iofiles"
+    TASK_TYPE_PYUNIT = "pyunit"
+  end
+
+  attr_accessible :description, :name, :user_id, :type, :wrapper_code
 
   has_many :runs
   belongs_to :user
+
+  include Constants
 end

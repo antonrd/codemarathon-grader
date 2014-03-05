@@ -8,7 +8,7 @@ require File.dirname(__FILE__) + "/runner_args.rb"
 opt = Options.new
 
 box = File.join(File.dirname(__FILE__), "../sandboxes/python_box.py")
-%x{python #{box} #{opt.python} #{opt.sandbox_user} #{opt.timelimit / 1000.0} #{opt.timelimit / 100.0} #{opt.mem * 1000} #{opt.input} #{opt.cmd} #{opt.output}}
+%x{python #{box} #{opt.python} #{opt.sandbox_user} #{opt.timelimit / 1000.0} #{opt.timelimit / 100.0} #{opt.mem * 1000} #{opt.input} #{opt.cmd} #{opt.output} #{opt.unittest}}
 
 status = -1000
 time_sec = 0
