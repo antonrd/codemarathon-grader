@@ -22,7 +22,7 @@ class Run < ActiveRecord::Base
 
   scope :latest_first, order('created_at desc')
   scope :earliest_first, order('created_at asc')
-  scope :pending, where({status: [STATUS_PENDING, STATUS_RUNNING, STATUS_STARTING])
+  scope :pending, where({status: [STATUS_PENDING, STATUS_RUNNING, STATUS_STARTING]})
 
   before_create do
     self.status = STATUS_PENDING if self.status.blank?

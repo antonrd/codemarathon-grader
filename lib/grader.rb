@@ -111,7 +111,7 @@ class Grader
     puts "Syncing tests from #{from} to #{to}"
     sync_command = @config[:sync] % [from, to]
     if verbose_system sync_command
-      run.update_attribute(:status, Run::STATUS_SUCCESS)
+      run.update_attributes(status: Run::STATUS_SUCCESS, message: "Done")
     else
       run.update_attributes(status: Run::STATUS_ERROR, message: $?)
     end    
