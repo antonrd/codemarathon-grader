@@ -59,16 +59,21 @@ class Grader
 
       found = false
       if run = Run.pending.earliest_first.first
-        case run.code
-        when Run::CODE_UPDATE_TASK
-          found = true
-          process_task_update(run)
-        when Run::CODE_RUN_TASK
-          found = true
-          grade(run)
-        when Run::CODE_UPDATE_CHECKER
-          found = true
-          update_checker(run)
+        if run.task.nil?
+          run.update_attributes(status: Run::STATUS_ERROR, 
+            message: "Run with an invalid task requested. Skipped.")
+        else
+          case run.code
+          when Run::CODE_UPDATE_TASK
+            found = true
+            process_task_update(run)
+          when Run::CODE_RUN_TASK
+            found = true
+            grade(run)
+          when Run::CODE_UPDATE_CHECKER
+            found = true
+            update_checker(run)
+          end
         end
       end
 
