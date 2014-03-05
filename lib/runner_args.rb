@@ -45,7 +45,6 @@ class Options
     end
 
     @cmd = ARGV.shift
-    if ARGV.length > 0
-      @unittest = ARGV.shift
+    @unittest = ARGV.shift if ARGV.length > 0
   end
 end
