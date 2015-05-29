@@ -7,8 +7,7 @@ require 'pathname'
 
 class Grader
   include ShellUtils
-  attr_reader :root, :user, :runner, :tests_updated_at, :grader_app
-  
+
   LANG_TO_COMPILER = {}
 
   class << self
@@ -16,7 +15,7 @@ class Grader
       old_stdout, old_stderr = $stdout.dup, $stderr.dup
       STDOUT.reopen(new_stdout)
       STDERR.reopen(new_stderr)
-      
+
       yield
     ensure
       STDOUT.reopen(old_stdout)
@@ -24,29 +23,14 @@ class Grader
     end
   end
 
-  # def initialize(root='', user)
   def initialize
-    # @root = root
-    # @user = user
-    
-    # sync_tests(Time.now)
     @config = get_config
   end
 
-  def get_config
-    grader_conf = YAML.load_file(Rails.root.join("config/grader.yml"))
-    puts "Reading configuration for env #{Rails.env}"
-    if !grader_conf[Rails.env]
-      puts "Cannot find configuration for #{Rails.env}. Check your config/grader.yml"
-      exit 1
-    end
-    grader_conf[Rails.env].with_indifferent_access
-  end
-  
   def run
     running = true
     puts "Ready to grade"
-    
+
     while running do
       ["INT", "TERM"].each do |signal|
         Signal.trap(signal) do
@@ -54,34 +38,16 @@ class Grader
           running = false
         end
       end
-      
-      # check_durty_tests
 
-      found = false
-      if run = Run.pending.earliest_first.first
-        if run.task.nil?
-          run.update_attributes(status: Run::STATUS_ERROR, 
-            message: "Run with an invalid task requested. Skipped.")
-        else
-          case run.code
-          when Run::CODE_UPDATE_TASK
-            found = true
-            process_task_update(run)
-          when Run::CODE_RUN_TASK
-            found = true
-            grade(run)
-          when Run::CODE_UPDATE_CHECKER
-            found = true
-            update_checker(run)
-          end
-        end
-      end
-
-      if !found
+      if !process_one_run
         sleep 1
       end
     end
   end
+
+  private
+
+  attr_reader :config
 
   def update_checker(run)
     Dir.chdir(File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s)) do
@@ -119,38 +85,48 @@ class Grader
       run.update_attributes(status: Run::STATUS_SUCCESS, message: "Done")
     else
       run.update_attributes(status: Run::STATUS_ERROR, message: $?)
-    end    
+    end
   end
 
   def grade(run)
     puts 'Grade task run: %d' % run.id
-    data = ActiveSupport::JSON.decode(run.data)
-    puts data
+
+    run_dir = prepare_run_directory(run)
+
+    execute_run(run, run_dir)
+
+    # Remove the directory after the execution.
+    # FileUtils.rm_rf(run_dir)
+  end
+
+  def prepare_run_directory(run)
     run_dir = File.join(@config[:files_root], @config[:runs_dir], run.id.to_s)
     FileUtils.mkdir_p(run_dir)
     FileUtils.rm(Dir.glob(File.join(run_dir, '*')))
+    run_dir
+  end
+
+  def execute_run(run, run_dir)
+    data = ActiveSupport::JSON.decode(run.data)
+    puts "Data received for run #{run.id}: #{data}"
+
     Dir.chdir(run_dir) do
       File.open("grader.log", "w") do |f|
         f.sync = true
-        #debugger
         self.class.with_stdout_and_stderr(f, f) do
           puts "Running process..."
           run.update_attributes(status: Run::STATUS_RUNNING,
                                 message: "Running")
-          if ['c++', 'java', 'python'].include?(data["lang"])
+          if supported_language?(data["lang"])
             if !compile(data["source_code"], data["lang"])
-              run.update_attributes(status: Run::STATUS_CE, 
-                message: 'Compilation error', 
+              run.update_attributes(status: Run::STATUS_CE,
+                message: 'Compilation error',
                 log: File.read("grader.log"))
             else
               input_file_pat = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'input.*.txt')
-              # puts input_file_pat
               input_files = Dir.glob(input_file_pat).sort
               output_file_pat = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'solve.*.txt')
               output_files = Dir.glob(output_file_pat).sort
-              # puts input_files
-              # puts output_files
-              #debugger
 
               if run.task.task_type == Task::TASK_TYPE_PYUNIT
                 File.open("wrapper_code.py", "w") do |f|
@@ -161,162 +137,178 @@ class Grader
               puts "Running tests..."
               results = run_tests(run, input_files, output_files, data["lang"])
 
-              run.update_attributes(status: Run::STATUS_SUCCESS, 
-                message: results, 
+              run.update_attributes(status: Run::STATUS_SUCCESS,
+                message: results,
                 log: File.read("grader.log"))
-            end        
+            end
           else
-            run.update_attributes(status: Run::STATUS_ERROR, 
-              message: 'Unknown language', 
-              log: File.read("grader.log"))            
+            run.update_attributes(status: Run::STATUS_ERROR,
+              message: 'Unknown language',
+              log: File.read("grader.log"))
           end
         end
       end
     end
-    # Remove the directory after the execution.
-    # FileUtils.rm_rf(run_dir)
   end
-  
-  private
-    def compile(source_code, language, file_name = "program")
-      puts "==== GRADER ==== Start compiling ===="
-      if language == 'c++'
-        # puts "Create file " + ("%.cpp" % [file_name])
-        File.open("%s.cpp" % [file_name], "w") do |f|
-          f.write(source_code)
-        end
-        
-        puts "Compiling C++ ..."
-        # verbose_system "g++ program.cpp -o program -O2 -static -lm -x c++"
-        verbose_system @config[:compile_cpp] % [file_name, file_name]
-      elsif language == 'java'
-        File.open("%s.java" % [file_name], "w") do |f|
-          f.write(source_code)
-        end
-        
-        puts "Compiling Java ..."
-        # verbose_system "g++ program.cpp -o program -O2 -static -lm -x c++"
-        verbose_system @config[:compile_java] % [file_name, file_name]
-      elsif language == 'python'
-        # Python is not compiled, just the source file is created here.
-        File.open("%s.py" % [file_name], "w") do |f|
-          f.write(source_code)
-        end
-        return true
-      end
 
-      puts "==== GRADER ==== End compiling ===="
+  def supported_language? lang
+    ['c++', 'java', 'python'].include?(lang)
+  end
 
-      if $?.nil?
-        return false
+  def get_config
+    grader_conf = YAML.load_file(Rails.root.join("config/grader.yml"))
+    puts "Reading configuration for env #{Rails.env}"
+    if !grader_conf[Rails.env]
+      puts "Cannot find configuration for #{Rails.env}. Check your config/grader.yml"
+      exit 1
+    end
+    grader_conf[Rails.env].with_indifferent_access
+  end
+
+  def process_one_run
+    found = false
+
+    if run = Run.pending.earliest_first.first
+      if run.task.nil?
+        run.update_attributes(status: Run::STATUS_ERROR,
+          message: "Run with an invalid task requested. Skipped.")
       else
-        return $?.exitstatus == 0
-      end
-    end
-    
-    def run_tests(run, input_files, output_files, language)
-      if input_files.empty? || output_files.empty?
-        return "No tests"
-      end
-
-      # for each test, run the program
-      input_files.zip(output_files).map { |input_file, answer_file|
-        base_name = Pathname.new(input_file).basename
-        if language == 'c++'
-          run_one_test(run, input_file, answer_file, "cpp")
-        elsif language == 'java'
-          run_one_test(run, input_file, answer_file, "java")
-        elsif language == 'python'
-          run_one_test(run, input_file, answer_file, "python")
+        case run.code
+        when Run::CODE_UPDATE_TASK
+          found = true
+          process_task_update(run)
+        when Run::CODE_RUN_TASK
+          found = true
+          grade(run)
+        when Run::CODE_UPDATE_CHECKER
+          found = true
+          update_checker(run)
         end
-      }.join(" ")
+      end
     end
 
-    def run_one_test(run, input_file, answer_file, config_lang)
+    found
+  end
+
+  def compile(source_code, language, file_name = "program")
+    puts "==== GRADER ==== Start compiling ===="
+    if language == 'c++'
+      # puts "Create file " + ("%.cpp" % [file_name])
+      File.open("%s.cpp" % [file_name], "w") do |f|
+        f.write(source_code)
+      end
+
+      puts "Compiling C++ ..."
+      # verbose_system "g++ program.cpp -o program -O2 -static -lm -x c++"
+      verbose_system @config[:compile_cpp] % [file_name, file_name]
+    elsif language == 'java'
+      File.open("%s.java" % [file_name], "w") do |f|
+        f.write(source_code)
+      end
+
+      puts "Compiling Java ..."
+      # verbose_system "g++ program.cpp -o program -O2 -static -lm -x c++"
+      verbose_system @config[:compile_java] % [file_name, file_name]
+    elsif language == 'python'
+      # Python is not compiled, just the source file is created here.
+      File.open("%s.py" % [file_name], "w") do |f|
+        f.write(source_code)
+      end
+      return true
+    end
+
+    puts "==== GRADER ==== End compiling ===="
+
+    if $?.nil?
+      return false
+    else
+      return $?.exitstatus == 0
+    end
+  end
+
+  def run_tests(run, input_files, output_files, language)
+    if input_files.empty? || output_files.empty?
+      return "No tests"
+    end
+
+    # for each test, run the program
+    input_files.zip(output_files).map { |input_file, answer_file|
       base_name = Pathname.new(input_file).basename
-      verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
-      # verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
+      if language == 'c++'
+        run_one_test(run, input_file, answer_file, "cpp")
+      elsif language == 'java'
+        run_one_test(run, input_file, answer_file, "java")
+      elsif language == 'python'
+        run_one_test(run, input_file, answer_file, "python")
+      end
+    }.join(" ")
+  end
 
-      runner = Pathname.new(File.join(File.dirname(__FILE__), @config["runner_#{config_lang}"])).realpath.to_s
+  def run_one_test(run, input_file, answer_file, config_lang)
+    base_name = Pathname.new(input_file).basename
+    verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
+    # verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
 
-      if run.task.task_type == Task::TASK_TYPE_PYUNIT
-          verbose_system "#{runner} --time #{run.max_time_ms} "\
-                         "--mem #{run.max_memory_kb} --procs 1 "\
-                         "--python #{@config[:python_exec]} "\
-                         "--sandbox-user #{@config[:python_sandbox_user]} "\
-                         "-i #{base_name} -o output "\
-                         "-- ./wrapper_code.py ./program.py"        
+    runner = Pathname.new(File.join(File.dirname(__FILE__), @config["runner_#{config_lang}"])).realpath.to_s
+
+    if run.task.task_type == Task::TASK_TYPE_PYUNIT
+        verbose_system "#{runner} --time #{run.max_time_ms} "\
+                       "--mem #{run.max_memory_kb} --procs 1 "\
+                       "--python #{@config[:python_exec]} "\
+                       "--sandbox-user #{@config[:python_sandbox_user]} "\
+                       "-i #{base_name} -o output "\
+                       "-- ./wrapper_code.py ./program.py"
+    else
+      if config_lang == 'python'
+        verbose_system "#{runner} --time #{run.max_time_ms} "\
+                       "--mem #{run.max_memory_kb} --procs 1 "\
+                       "--python #{@config[:python_exec]} "\
+                       "--sandbox-user #{@config[:python_sandbox_user]} "\
+                       "-i #{base_name} -o output "\
+                       "-- ./program.py"
       else
-        if config_lang == 'python'
-          verbose_system "#{runner} --time #{run.max_time_ms} "\
-                         "--mem #{run.max_memory_kb} --procs 1 "\
-                         "--python #{@config[:python_exec]} "\
-                         "--sandbox-user #{@config[:python_sandbox_user]} "\
-                         "-i #{base_name} -o output "\
-                         "-- ./program.py"
-        else
-          verbose_system "#{runner} --time #{run.max_time_ms} "\
-                         "--mem #{run.max_memory_kb} --procs 1 "\
-                         "-i #{base_name} -o output -- ./program"
-        end
-      end
-      result = "n/a"
-      run_status = $?.exitstatus
-      
-      puts "==== GRADER ==== Start cleanup"
-      dir_name = Pathname.new(input_file).dirname
-      verbose_system(@config["cleanup_#{config_lang}".to_sym])
-      puts "==== GRADER ==== End cleanup"
-
-      case run_status
-        when 9
-          result = "tl"
-        when 127
-          result = "ml"
-        when 0
-          result = check_output(run, answer_file, input_file)
-        else
-          result = "re"
-      end
-
-      return result
-    end
-
-    def sync_tests(update_time)
-      SetsSync.sync_sets(get_config)
-      @tests_updated_at = update_time
-      puts "Tests synced for time #{@tests_updated_at} on #{Time.now}"
-    end
-
-    def check_durty_tests
-      if (last_update = Configuration.get(Configuration::TESTS_UPDATED_AT)) and last_update > @tests_updated_at
-        # Download the tests again
-        puts "Tests changed at #{last_update}, while the current version is from #{@tests_updated_at}. Syncing..."
-        sync_tests(last_update)
+        verbose_system "#{runner} --time #{run.max_time_ms} "\
+                       "--mem #{run.max_memory_kb} --procs 1 "\
+                       "-i #{base_name} -o output -- ./program"
       end
     end
-    
-    def check_output(run, answer_file, input_file)
-      puts "Checking output..."
-      if run.task.checker
-        checker = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'checker')
-        verbose_system "#{checker} #{input_file} #{answer_file} output"
+    result = "n/a"
+    run_status = $?.exitstatus
+
+    puts "==== GRADER ==== Start cleanup"
+    dir_name = Pathname.new(input_file).dirname
+    verbose_system(@config["cleanup_#{config_lang}".to_sym])
+    puts "==== GRADER ==== End cleanup"
+
+    case run_status
+      when 9
+        result = "tl"
+      when 127
+        result = "ml"
+      when 0
+        result = check_output(run, answer_file, input_file)
       else
-        checker = "ruby " + Rails.root.join("lib/execs/diff.rb").to_s
-        verbose_system "#{checker} #{answer_file} output"
-      end
-      
-      if $?.exitstatus != 0
-        "wa"
-      else
-        "ok"
-      end
-      
+        result = "re"
     end
 
-    def update_attributes(run, dry_run, attrs)
-      run.attributes = attrs
-      
-      run.save unless dry_run
+    return result
+  end
+
+  def check_output(run, answer_file, input_file)
+    puts "Checking output..."
+    if run.task.checker
+      checker = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s, 'checker')
+      verbose_system "#{checker} #{input_file} #{answer_file} output"
+    else
+      checker = "ruby " + Rails.root.join("lib/execs/diff.rb").to_s
+      verbose_system "#{checker} #{answer_file} output"
     end
+
+    if $?.exitstatus != 0
+      "wa"
+    else
+      "ok"
+    end
+
+  end
 end
