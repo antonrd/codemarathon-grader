@@ -8,26 +8,37 @@
 </head>
 <body>
 
-<% if user_signed_in? %>
-  <div>
-    Logged in as <strong><%= current_user.email %></strong>.
-    <%= link_to 'Edit profile', edit_user_registration_path %> |
-    <%= link_to "Logout", destroy_user_session_path, method: :delete %>
+<div class="container">
+  <div class="row header">
+    <% if user_signed_in? %>
+      <div class="pull-right">
+        Signed in as <strong><%= current_user.email %></strong>.
+        <%= link_to 'Edit profile', edit_user_registration_path %> |
+        <%= link_to "Sign out", destroy_user_session_path %>
+      </div>
+      <div class="main-menu">
+        <span class="<%= 'active' if is_tasks_page? %>"><%= link_to 'Tasks', tasks_path %></span>
+        <span class="<%= 'active' if is_runs_page? %>"><%= link_to 'Runs', runs_path %></span>
+      </div>
+    <% else %>
+      <div class="pull-left">
+        <%= link_to "Sign up", new_user_registration_path %> |
+        <%= link_to "Sign in", new_user_session_path %>
+      </div>
+    <% end %>
   </div>
-  <div>
-    <%= link_to 'Tasks', tasks_path %>
-    <%= link_to 'Runs', runs_path %>
-  </div>
-<% else %>
-  <%= link_to "Sign up", new_user_registration_path %> |
-  <%= link_to "Login", new_user_session_path %>
-<% end %>
 
-<% flash.each do |name, msg| %>
-  <%= content_tag :div, msg, id: "flash_#{name}" %>
-<% end %>
+  <% if flash.present? %>
+    <div class="alert alert-warning alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <% flash.each do |name, msg| %>
+        <%= content_tag :div, msg, id: "flash_#{name}" %>
+      <% end %>
+    </div>
+  <% end %>
 
-<%= yield %>
+  <%= yield %>
+</div>
 
 </body>
 </html>

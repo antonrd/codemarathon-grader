@@ -1,2 +1,33 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
+
+.main-menu {
+  span {
+    width: 150px;
+    max-width: 150px;
+    background: #eee;
+    padding: 10px;
+    font-size: 20px;
+  }
+
+  span:hover {
+    background-color: #ddd;
+  }
+
+  span.active {
+    background-color: #bbb;
+  }
+}
+
+.header {
+  margin-bottom: 30px;
+}
+
+.alert {
+  width: 500px;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  margin-left: -250px;
+  opacity: 0.9;
+}

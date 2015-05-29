@@ -1,10 +1,11 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<h2>Edit Profile</h2>
 
 <div>
   <% if current_user.api_key.nil? || current_user.api_key.access_token.nil? %>
     No API token yet.
   <% else %>
-    <b>API token:</b> <%= current_user.api_key.access_token %>
+    <b>API token:</b> <%= current_user.api_key.access_token %> <br />
+    <small>Use this token to make API calls to the grader.</small>
   <% end %>
 </div>
 

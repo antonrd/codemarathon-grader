@@ -1,5 +1,7 @@
 class RunsController < ApplicationController
+
   before_filter :restrict_access, except: [:index]
+  before_filter :authenticate_user!, only: [:index]
 
   def index
     @runs = current_user.runs.latest_first
@@ -55,9 +57,9 @@ class RunsController < ApplicationController
     if @run.nil?
       render inline: {status: 1, message: "Invalid run ID specified."}.to_json
     else
-      render inline: {status: 0, 
-                      run_status: @run.status, 
-                      run_message: @run.message, 
+      render inline: {status: 0,
+                      run_status: @run.status,
+                      run_message: @run.message,
                       run_log: @run.log}.to_json
     end
   end
