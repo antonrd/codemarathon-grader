@@ -1,14 +1,14 @@
 source 'https://rubygems.org'
 
-ruby '2.1.5'
+ruby '2.2.2'
 
-gem 'rails', '4.0.0'
+gem 'rails', '4.1.2'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'mysql2', '~> 0.3.11'
-gem 'json', '1.8.0'
+gem 'json', '1.8.2'
 gem 'devise', '~> 3.0'
 
 gem "foreman", "~> 0.63.0"
