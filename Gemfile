@@ -9,7 +9,7 @@ gem 'rails', '4.1.2'
 
 gem 'mysql2', '~> 0.3.11'
 gem 'json', '1.8.2'
-gem 'devise', '~> 3.0'
+gem 'devise', '~> 3.5.1'
 
 gem "foreman", "~> 0.63.0"
 

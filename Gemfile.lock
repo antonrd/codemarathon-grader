@@ -148,7 +148,7 @@ DEPENDENCIES
   byebug
   capistrano (= 2.15.4)
   coffee-rails (~> 4.1)
-  devise (~> 3.0)
+  devise (~> 3.5.1)
   foreman (~> 0.63.0)
   jquery-rails
   json (= 1.8.2)
