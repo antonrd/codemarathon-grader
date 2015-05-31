@@ -1,0 +1,32 @@
+---
+- hosts: all
+  sudo: no
+
+  tasks:
+    - name: Install packages
+      action: apt pkg={{ item }} state=present update_cache=yes
+      sudo: yes
+      with_items:
+        - nodejs
+        - libmysqlclient-dev
+
+    - name: RVM public key
+      shell: gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
+
+    - name: install rvm
+      shell: curl -L https://get.rvm.io | bash -s stable --autolibs=3 creates=~/.rvm
+
+    - name: install ruby
+      shell: ~/.rvm/bin/rvm install --default 2.1.5 creates=~/.rvm/rubies/ruby-2.1.5
+
+    - name: Install Bundler
+      sudo_user: grader
+      command: bash -lc "gem install bundler"
+
+    - name: install MySQL
+      sudo: yes
+      apt: name={{ item }} state=latest
+      with_items:
+        - mysql-server
+        - mysql-client
+        - python-mysqldb

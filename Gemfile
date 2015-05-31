@@ -15,7 +15,7 @@ gem "foreman", "~> 0.63.0"
 gem 'bootstrap-sass', '~> 3.3.4'
 
 group :development, :test do
-  gem 'debugger'
+  gem 'byebug'
 end
 
 # Gems used only for assets and not required
