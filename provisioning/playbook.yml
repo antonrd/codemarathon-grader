@@ -9,6 +9,7 @@
       with_items:
         - nodejs
         - libmysqlclient-dev
+        - sendmail
 
     - name: RVM public key
       shell: gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
@@ -17,7 +18,7 @@
       shell: curl -L https://get.rvm.io | bash -s stable --autolibs=3 creates=~/.rvm
 
     - name: install ruby
-      shell: ~/.rvm/bin/rvm install --default 2.1.5 creates=~/.rvm/rubies/ruby-2.1.5
+      shell: ~/.rvm/bin/rvm install --default 2.2.2 creates=~/.rvm/rubies/ruby-2.2.2
 
     - name: Install Bundler
       sudo_user: grader
