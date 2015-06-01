@@ -1,4 +1,4 @@
-root = "/home/grader/applications/grader/current"
+root = "/home/grader/applications/grader"
 working_directory root
 pid "#{root}/tmp/pids/unicorn.pid"
 stderr_path "#{root}/log/unicorn.log"

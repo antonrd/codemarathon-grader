@@ -6,7 +6,7 @@
     - name: Get project code from Github
       git:
         repo=git@github.com:antonrd/codemarathon-grader.git
-        dest=~/applications/grader
+        dest=~/applications/grader/current
         accept_hostkey=yes
         version=master
 
