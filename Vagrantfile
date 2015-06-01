@@ -70,7 +70,7 @@ Vagrant.configure(2) do |config|
   # SHELL
 
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "provisioning/playbook.yml"
+    ansible.playbook = "provisioning/setup_vagrant.yml"
     ansible.sudo = true
     ansible.limit = "all"
   end

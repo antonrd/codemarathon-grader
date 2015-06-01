@@ -14,8 +14,9 @@ set :deploy_via, :remote_cache
 set :use_sudo, false
 
 set :scm, "git"
-set :repository, "git@bitbucket.org:antonrd/tasks-grader.git"
+set :repository, "git@github.com:antonrd/codemarathon-grader.git"
 set :branch, "master"
+set :remote, "github"
 #set :branch, "develop"
 
 default_run_options[:pty] = true
@@ -71,7 +72,7 @@ namespace :deploy do
     run "ln -nfs #{shared_path}/config/grader.yml #{release_path}/config/grader.yml"
   end
   after "deploy:finalize_update", "deploy:symlink_config"
-  
+
   desc "Reload the database with seed data"
   task :seed do
     run "cd #{current_path}; bundle exec rake db:seed RAILS_ENV=production"
