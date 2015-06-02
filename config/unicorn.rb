@@ -1,3 +1,4 @@
+# root = "/home/grader/applications/grader"
 root = "/home/grader/applications/grader"
 working_directory root
 pid "#{root}/tmp/pids/unicorn.pid"
