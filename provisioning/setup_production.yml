@@ -27,3 +27,5 @@
 # Host codemarathon
 #    ...
 #    ForwardAgent yes
+
+# Start/restart upstart in a more clever way, make it more robust.

@@ -30,6 +30,16 @@
   become_method: sudo
   template: src=nginx_config.j2 dest=/etc/nginx/sites-enabled/{{ app_name }} mode=0744
 
+- name: Set up upstart for grader rake task
+  shell: bash -lc "rvmsudo foreman export upstart /etc/init -a {{ app_name }} -u grader"
+  args:
+    chdir: "{{ app_root }}"
+
+- name: Start grader rake task for the first time
+  become: yes
+  become_method: sudo
+  shell: bash -lc "start {{ app_name }}"
+
 # - name: Create symlink for unicorn config
 #   file: src="{{ app_root }}"/config/unicorn_init.sh dest=/etc/init.d/unicorn_"{{ app_name }}" state=link
 
