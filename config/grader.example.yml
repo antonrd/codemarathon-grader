@@ -1,5 +1,5 @@
 development:
-  sync: rsync -azv -e ssh pierrelombard@192.168.1.101:%s %s
+  sync: rsync -azv -e ssh pierrelombard@192.168.0.100:%s %s
   # files_root: /Users/pierrelombard/tmp
   files_root: /home/vagrant/grader_root
   sync_to: sets
