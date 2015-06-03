@@ -2,35 +2,28 @@
 - hosts: all
   sudo: no
 
-  tasks:
-    - name: Install packages
-      action: apt pkg={{ item }} state=present update_cache=yes
-      sudo: yes
-      with_items:
-        - nodejs
-        - libmysqlclient-dev
-        - sendmail
+  vars:
+    app_root: /home/grader/applications/grader
+    app_name: codemarathon_grader
+    git_repo: git@github.com:antonrd/codemarathon-grader.git
+    server_name: grader.codemarathon.com
+    ruby_version: 2.2.2
 
-    - name: RVM public key
-      shell: gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
+  roles:
+    - install
+    - config
+    - restart
 
-    - name: Install rvm
-      shell: curl -L https://get.rvm.io | bash -s stable --autolibs=3 creates=~/.rvm
+# Additional tasks to perform manually:
+# create grader user in sudo/admin group
+  # sudo adduser grader
+  # sudo usermod -a -G admin userName
+  # sudo usermod -a -G sudo userName
+  # create ~/.ssh/authorized_keys with public key
+  # sudo visudo -f /etc/sudoers.d/myOverrides and add 'grader  ALL=NOPASSWD: ALL' to not ask for password on sudo
+# change /etc/hosts to make sendmail work fast
 
-    - name: Install ruby
-      shell: ~/.rvm/bin/rvm install --default 2.2.2 creates=~/.rvm/rubies/ruby-2.2.2
-
-    - name: Install Bundler
-      sudo_user: grader
-      command: bash -lc "gem install bundler"
-
-    - name: Install MySQL
-      sudo: yes
-      apt: name={{ item }} state=latest
-      with_items:
-        - mysql-server
-        - mysql-client
-        - python-mysqldb
-
-    - name: Creates directory
-      file: path=~/applications/grader state=directory
+# Locally fix ~/.ssh/config to do forwarding of keys:
+# Host codemarathon
+#    ...
+#    ForwardAgent yes

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  sudo: no
+
+  vars:
+    app_root: /home/grader/applications/grader
+    app_name: codemarathon_grader
+    git_repo: git@github.com:antonrd/codemarathon-grader.git
+
+  roles:
+    - deploy
+    - restart

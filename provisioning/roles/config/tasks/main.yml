@@ -1,0 +1,37 @@
+---
+- name: Get project code from Github
+  git:
+    repo="{{ git_repo }}"
+    dest="{{ app_root }}"
+    accept_hostkey=yes
+    version=master
+    force=yes
+
+- name: Bundle install
+  command: bash -lc "bundle install"
+  args:
+    chdir: "{{ app_root }}"
+
+- name: Set up database
+  shell: bash -lc "RAILS_ENV=production bundle exec rake db:setup"
+  args:
+    chdir: "{{ app_root }}"
+
+- name: Create pids directory
+  file: path="{{ app_root }}"/tmp/pids state=directory
+
+- name: Create unicorn init script
+  become: yes
+  become_method: sudo
+  template: src=unicorn_init.j2 dest=/etc/init.d/unicorn_{{ app_name }} mode=0744
+
+- name: Create nginx config
+  become: yes
+  become_method: sudo
+  template: src=nginx_config.j2 dest=/etc/nginx/sites-enabled/{{ app_name }} mode=0744
+
+# - name: Create symlink for unicorn config
+#   file: src="{{ app_root }}"/config/unicorn_init.sh dest=/etc/init.d/unicorn_"{{ app_name }}" state=link
+
+# - name: Create symlink for nginx config
+#   file: src="{{ app_root }}"/config/nginx.conf dest=/etc/nginx/sites-enabled/"{{ app_name }}" state=link
