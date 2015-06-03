@@ -2,5 +2,8 @@
 - hosts: all
   sudo: no
 
+  vars:
+    ruby_version: 2.2.2
+
   roles:
     - install

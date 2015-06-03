@@ -22,6 +22,8 @@
   # create ~/.ssh/authorized_keys with public key
   # sudo visudo -f /etc/sudoers.d/myOverrides and add 'grader  ALL=NOPASSWD: ALL' to not ask for password on sudo
 # change /etc/hosts to make sendmail work fast
+# VM: 127.0.0.1 grader.codemarathon.com localhost grader.codemarathon.com
+# Vagrant: 127.0.0.1 localhost.localdomain localhost vagrant-ubuntu-trusty-64
 
 # Locally fix ~/.ssh/config to do forwarding of keys:
 # Host codemarathon
