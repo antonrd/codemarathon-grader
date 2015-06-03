@@ -15,7 +15,7 @@ class TasksController < ApplicationController
       return
     end
 
-    @task = @user.tasks.create(params[:task])
+    @task = @user.tasks.create(task_params)
 
     if @task.save
       render inline: {status: 0, message: "New task created.", task_id: @task.id}.to_json
@@ -35,11 +35,17 @@ class TasksController < ApplicationController
 
     @task = @user.tasks.find_by_id(params[:task_id])
 
-    if @task.update_attributes(params[:task])
+    if @task.update_attributes(task_params)
       render inline: {status: 0, message: "Task updated.", task_id: @task.id}.to_json
     else
       render inline: {status: 1,
         message: "Failed to update task. Error: %s" % @task.errors.full_messages}.to_json
     end
+  end
+
+  private
+
+  def task_params
+    params.require(:task).permit(:name, :description, :task_type)
   end
 end

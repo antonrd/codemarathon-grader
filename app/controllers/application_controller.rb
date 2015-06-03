@@ -19,6 +19,7 @@ protected
         request.path != "/users/password/new" &&
         request.path != "/users/password/edit" &&
         request.path != "/users/confirmation" &&
+        request.path != "/users/confirmation/new" &&
         request.path != "/users/sign_out" &&
         !request.xhr?) # don't store ajax calls
       session[:previous_url] = request.fullpath
