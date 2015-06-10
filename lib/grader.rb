@@ -52,7 +52,16 @@ class Grader
   def update_checker(run)
     Dir.chdir(File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s)) do
       File.open("grader.log", "w") do |f|
-        data = ActiveSupport::JSON.decode(run.data)
+        begin
+          data = ActiveSupport::JSON.decode(run.data)
+        rescue ActiveSupport::JSON.parse_error
+          Rails.logger.warn("Attempted to decode invalid JSON: #{run.data}")
+          run.update_attributes(status: Run::STATUS_ERROR,
+            message: 'Attempted to decode invalid JSON: #{run.data}',
+            log: File.read("grader.log"))
+          return
+        end
+
         if data["source_code"].empty?
           run.task.update_attribute(:checker, nil)
           run.update_attributes(status: Run::STATUS_SUCCESS,
@@ -73,15 +82,24 @@ class Grader
   end
 
   def process_task_update(run)
+    sync_status = true
+
     puts 'Update task run: %d' % run.id
-    from = File.join(run.user.file_path, run.data.to_s, '*')
     to = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s)
-    FileUtils.mkdir_p(to)
     puts "Removing %s" % File.join(to, '*')
     FileUtils.rm(Dir.glob(File.join(to, '*')))
-    puts "Syncing tests from #{from} to #{to}"
-    sync_command = @config[:sync] % [from, to]
-    if verbose_system sync_command
+    FileUtils.mkdir_p(to)
+
+    [@config[:input_file_pattern], @config[:output_file_pattern]].each do |file_pattern|
+      from = File.join(run.user.file_path, run.data.to_s, file_pattern)
+      puts "Syncing tests from #{from} to #{to}"
+      sync_command = "#{@config[:sync]} #{from} #{to}"
+
+      sync_status = false if !verbose_system sync_command
+      break if !sync_status
+    end
+
+    if sync_status
       run.update_attributes(status: Run::STATUS_SUCCESS, message: "Done")
     else
       run.update_attributes(status: Run::STATUS_ERROR, message: $?)
@@ -107,8 +125,16 @@ class Grader
   end
 
   def execute_run(run, run_dir)
-    data = ActiveSupport::JSON.decode(run.data)
-    puts "Data received for run #{run.id}: #{data}"
+    data = nil
+    begin
+      data = ActiveSupport::JSON.decode(run.data)
+      puts "Data received for run #{run.id}: #{data}"
+    rescue ActiveSupport::JSON.parse_error
+      Rails.logger.warn("Attempted to decode invalid JSON: #{run.data}")
+      run.update_attributes(status: Run::STATUS_ERROR,
+        message: 'Attempted to decode invalid JSON: #{run.data}')
+      return
+    end
 
     Dir.chdir(run_dir) do
       File.open("grader.log", "w") do |f|
@@ -152,7 +178,8 @@ class Grader
   end
 
   def supported_language? lang
-    ['c++', 'java', 'python'].include?(lang)
+    @config[:languages].split(';').select{ |lang| lang.strip.length > 0 }.include?(lang)
+    # ['c++', 'java'].include?(lang)
   end
 
   def get_config
@@ -246,6 +273,8 @@ class Grader
 
   def run_one_test(run, input_file, answer_file, config_lang)
     base_name = Pathname.new(input_file).basename
+    return "re" if @config["init_#{config_lang}".to_sym].nil?
+
     verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
     # verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
 

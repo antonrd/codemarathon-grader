@@ -30,4 +30,7 @@
 #    ...
 #    ForwardAgent yes
 
+# Add grader's public key to authorized_keys on the client machine so that rsync works
+# Copy/link MOE sandbox from sandboxes/isolate to ~/moe_sandbox/run/bin/isolate
+
 # Start/restart upstart in a more clever way, make it more robust.

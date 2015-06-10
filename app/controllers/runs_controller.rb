@@ -15,7 +15,7 @@ class RunsController < ApplicationController
       return
     end
 
-    @run = @user.runs.create(params[:run])
+    @run = @user.runs.create(run_params)
 
     if @run.save
       reply = {run_id: @run.id, status: 0, message: "New run created successfully."}
@@ -62,5 +62,11 @@ class RunsController < ApplicationController
                       run_message: @run.message,
                       run_log: @run.log}.to_json
     end
+  end
+
+  private
+
+  def run_params
+    params.require(:run).permit(:task_id, :code, :data)
   end
 end

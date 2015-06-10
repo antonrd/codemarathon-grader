@@ -1,11 +1,11 @@
 development:
-  sync: rsync -azv -e ssh pierrelombard@192.168.0.100:%s %s
-  # files_root: /Users/pierrelombard/tmp
+  languages: c++;java
+  input_file_pattern: input.*.txt
+  output_file_pattern: solve.*.txt
+  sync: rsync -azv -e ssh
   files_root: /home/vagrant/grader_root
   sync_to: sets
   runs_dir: runs
-  # run_cpp: ./program < %s > output
-  # run_java: java program < %s > output
   compile_cpp: g++ %s.cpp -o %s -O2
   compile_java: gcj --main=program %s.java -o %s
   runner_cpp: isolate_runner.rb
@@ -18,7 +18,11 @@ development:
   cleanup_java: cat stat; sudo cp /tmp/box/0/box/output .; head -2 output; sudo ~/moe_sandbox/run/bin/isolate --cleanup
   python_exec: /home/deployer/codemarathon-sandbox/bin/python
   python_sandbox_user: sandbox
+  init_python:
 test:
+  languages: c++;java
+  input_file_pattern: input.*.txt
+  output_file_pattern: solve.*.txt
   sync: cp
   files_root: /Users/pierrelombard/tmp
   sync_to: sets
@@ -26,13 +30,13 @@ test:
   run_cpp: ./program < %s > output
   run_java: java program < %s > output
 production:
+  languages: c++;java
+  input_file_pattern: input.*.txt
+  output_file_pattern: solve.*.txt
   sync: rsync -azv -e ssh %s %s
-  # files_root: /Users/pierrelombard/tmp
   files_root: /home/deployer/grader_root
   sync_to: sets
   runs_dir: runs
-  # run_cpp: ./program < %s > output
-  # run_java: java program < %s > output
   compile_cpp: g++ %s.cpp -o %s -O2
   compile_java: gcj --main=program %s.java -o %s
   runner: isolate_runner.rb

@@ -1,9 +1,15 @@
 class ApplicationController < ActionController::Base
   before_filter :store_location
+  before_action :configure_permitted_parameters, if: :devise_controller?
 
   protect_from_forgery
 
-protected
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.for(:account_update) << :file_path
+  end
+
   def restrict_access
     authenticate_or_request_with_http_token do |token, options|
       api_key = ApiKey.where(access_token: token).first
