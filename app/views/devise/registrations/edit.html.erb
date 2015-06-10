@@ -30,7 +30,7 @@
   <%= f.password_field :password_confirmation %></div>
 
   <div><%= f.label :file_path %> <i>(indicates the username, host and path to the sets directory from where tests will be fetched, e.g. someuser@some_host:path/to/sets)</i><br />
-  <%= f.text_field :file_path %></div>
+  <%= f.text_field :file_path, :class => 'input-large' %></div>
 
   <div><%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i><br />
   <%= f.password_field :current_password %></div>

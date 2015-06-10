@@ -91,24 +91,34 @@ class Grader
     sync_status = true
 
     puts 'Update task run: %d' % run.id
-    to = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s)
-    puts "Removing %s" % File.join(to, '*')
-    FileUtils.rm(Dir.glob(File.join(to, '*')))
-    FileUtils.mkdir_p(to)
 
-    [@config[:input_file_pattern], @config[:output_file_pattern]].each do |file_pattern|
-      from = File.join(run.user.file_path, run.data.to_s, file_pattern)
-      puts "Syncing tests from #{from} to #{to}"
-      sync_command = "#{@config[:sync]} #{from} #{to}"
+    File.open("grader.log", "w") do |f|
+      f.sync = true
+      self.class.with_stdout_and_stderr(f, f) do
+        to = File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s)
+        puts "Removing %s" % File.join(to, '*')
+        FileUtils.rm(Dir.glob(File.join(to, '*')))
+        FileUtils.mkdir_p(to)
 
-      sync_status = false if !verbose_system sync_command
-      break if !sync_status
+        [@config[:input_file_pattern], @config[:output_file_pattern]].each do |file_pattern|
+          from = File.join(run.user.file_path, run.data.to_s, file_pattern)
+          puts "Syncing tests from #{from} to #{to}"
+          sync_command = "#{@config[:sync]} #{from} #{to}"
+
+          sync_status = false if !verbose_system sync_command
+          break if !sync_status
+        end
+      end
     end
 
     if sync_status
-      run.update_attributes(status: Run::STATUS_SUCCESS, message: "Done")
+      run.update_attributes(status: Run::STATUS_SUCCESS,
+                            message: "Done",
+                            log: File.read("grader.log"))
     else
-      run.update_attributes(status: Run::STATUS_ERROR, message: $?)
+      run.update_attributes(status: Run::STATUS_ERROR,
+                            message: $?,
+                            log: File.read("grader.log"))
     end
   end
 

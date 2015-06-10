@@ -67,6 +67,6 @@ class RunsController < ApplicationController
   private
 
   def run_params
-    params.require(:run).permit(:task_id, :code, :data)
+    params.require(:run).permit(:task_id, :code, :data, :max_memory_kb, :max_time_ms)
   end
 end
