@@ -52,8 +52,10 @@ class Grader
   def update_checker(run)
     Dir.chdir(File.join(@config[:files_root], @config[:sync_to], run.task_id.to_s)) do
       File.open("grader.log", "w") do |f|
+        f.sync = true
         begin
           data = ActiveSupport::JSON.decode(run.data)
+          puts "Data received for run #{run.id}: #{data}"
         rescue ActiveSupport::JSON.parse_error
           Rails.logger.warn("Attempted to decode invalid JSON: #{run.data}")
           run.update_attributes(status: Run::STATUS_ERROR,
@@ -62,21 +64,25 @@ class Grader
           return
         end
 
-        if data["source_code"].empty?
-          run.task.update_attribute(:checker, nil)
-          run.update_attributes(status: Run::STATUS_SUCCESS,
-                                message: "Default checker set")
-        else
-          if compile(data["source_code"], data["lang"], "checker")
+        self.class.with_stdout_and_stderr(f, f) do
+          if data["source_code"].empty?
+            run.task.update_attribute(:checker, nil)
             run.update_attributes(status: Run::STATUS_SUCCESS,
-                                  message: "New checker set")
-            run.task.update_attribute(:checker, data["lang"])
+                                  message: "Default checker set")
           else
-            run.update_attributes(status: Run::STATUS_CE,
-                                  message: "Compilation error",
-                                  log: File.read("grader.log"))
+            if compile(data["source_code"], data["lang"], "checker")
+              run.update_attributes(status: Run::STATUS_SUCCESS,
+                                    message: "New checker set",
+                                    log: File.read("grader.log"))
+              run.task.update_attribute(:checker, data["lang"])
+            else
+              run.update_attributes(status: Run::STATUS_CE,
+                                    message: "Compilation error",
+                                    log: File.read("grader.log"))
+            end
           end
         end
+
       end
     end
   end
