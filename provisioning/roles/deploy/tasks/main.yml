@@ -21,5 +21,3 @@
   shell: bash -lc "RAILS_ENV=production bundle exec rake assets:precompile"
   args:
     chdir: "{{ app_root }}"
-
-# add handlers for restarting nginx, unicorn
