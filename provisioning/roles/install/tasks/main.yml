@@ -16,6 +16,7 @@
     - git
     - g++
     - gcj-jdk
+    - linux-image-generic-lts-trusty
 
 - name: RVM public key
   # This fails sometimes, needs reruning
@@ -53,3 +54,12 @@
   become: yes
   become_method: sudo
   mysql_user: name=grader password= priv=*.*:ALL state=present
+
+- name: Installs Docker
+  shell: wget -qO- https://get.docker.com/ | sh
+
+# https://github.com/mitchellh/vagrant/issues/3341
+# https://docs.docker.com/installation/ubuntulinux/#installing-docker-on-ubuntu (for Grub, to handle memory limits)
+# https://help.ubuntu.com/community/SSH/OpenSSH/Keys (ssh keys)
+
+# TODO: Set up docker container for grader!

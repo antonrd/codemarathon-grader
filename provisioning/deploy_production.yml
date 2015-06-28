@@ -9,4 +9,4 @@
 
   roles:
     - deploy
-    - restart
+    # - restart

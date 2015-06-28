@@ -3,11 +3,11 @@ require 'net/http'
 require 'uri'
 
 uri = URI('http://localhost:3030/runs')
-access_token = "8223fb5a81dd5ca98d267df6907d3cb3"
+access_token = "ca338c89b83f8a153f2f95149ff51e17"
 headers = { "Authorization" => "Token token=\"#{access_token}\"" }
 req = Net::HTTP::Post.new(uri, headers)
 
-data_hash = {"source_code" => "int main() { return 0; }", "lang" => "c++"}
+data_hash = {"source_code" => "#!/usr/bin/python2.7", "lang" => "python"}
 # data_hash = {"source_code" => "class program {public static int main(String[] args) {return 0;}}", "lang" => "java"}
 # data_hash = {"source_code" => "", "lang" => "python"}
 

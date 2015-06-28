@@ -6,6 +6,7 @@
       <th>ID</th>
       <th>Name</th>
       <th>Type</th>
+      <th>Checker</th>
       <th>Description</th>
     </tr>
     <% @tasks.each do |task| %>
@@ -13,6 +14,7 @@
         <td><%= task.id %></td>
         <td><%= task.name %></td>
         <td><%= task.task_type %></td>
+        <td><%= task.checker.present? ? task.checker : 'Default' %></td>
         <td><%= task.description %></td>
       </tr>
     <% end %>
