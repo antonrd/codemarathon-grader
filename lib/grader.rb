@@ -4,27 +4,33 @@ class Grader
 
   def initialize
     load_config
+
+    @running = false
   end
 
   def run
-    running = true
+    @running = true
+    register_signals
+
     puts "Ready to grade"
 
     while running do
-      ["INT", "TERM"].each do |signal|
-        Signal.trap(signal) do
-          puts "Stopping..."
-          running = false
-        end
-      end
-
-      sleep 1 unless process_one_run
+      sleep 5 unless process_one_run
     end
   end
 
   private
 
-  attr_reader :config
+  attr_reader :config, :running
+
+  def register_signals
+    ["INT", "TERM"].each do |signal|
+      Signal.trap(signal) do
+        puts "Stopping..."
+        @running = false
+      end
+    end
+  end
 
   def load_config
     @config = GraderConfig.new("config/grader.yml")
