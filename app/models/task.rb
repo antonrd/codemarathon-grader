@@ -4,7 +4,7 @@ class Task < ActiveRecord::Base
     TASK_TYPE_PYUNIT = "pyunit"
   end
 
-  has_many :runs
+  has_many :runs, dependent: :destroy
   belongs_to :user
 
   include Constants

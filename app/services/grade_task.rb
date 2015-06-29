@@ -43,6 +43,7 @@ class GradeTask
             update_run(Run::STATUS_CE, 'Compilation error')
           else
             if run.task.task_type == Task::TASK_TYPE_PYUNIT
+              puts "Creating wrapper code for Python unit test ..."
               File.open("wrapper_code.py", "w") do |f|
                 f.write(run.task.wrapper_code)
               end

@@ -24,71 +24,36 @@ class RunTest
   attr_reader :config, :run, :input_file, :answer_file, :config_lang
 
   def run_one_test
-    # clean_sandbox
-
     base_name = Pathname.new(input_file).basename
-    # puts "Here we are"
-    # return "re" if @config["init_#{config_lang}".to_sym].nil?
-    # puts "Past the config check"
-
-    # verbose_system(@config["init_#{config_lang}".to_sym] % [input_file])
-    # verbose_system(@config["run_#{config_lang}".to_sym] % [base_name])
-
-    # runner = Pathname.new(File.join(File.dirname(__FILE__), @config["runner_#{config_lang}"])).realpath.to_s
 
     run_status = -1
 
     if run.task.task_type == Task::TASK_TYPE_PYUNIT
-        verbose_system "#{ runner } --time #{ run.max_time_ms } "\
-                       "--mem #{ run.max_memory_kb } --procs 1 "\
-                       "--python #{ @config[:python_exec] } "\
-                       "--sandbox-user #{ @config[:python_sandbox_user] } "\
-                       "-i #{ base_name } -o output "\
-                       "-- ./wrapper_code.py ./program.py"
-
-        run_status = $?.exitstatus
+      executable = config.value("exec_python_unit")
     else
-      # if config_lang == 'python'
-        # verbose_system "#{runner} --time #{run.max_time_ms} "\
-        #                "--mem #{run.max_memory_kb} --procs 1 "\
-        #                "-i #{base_name} -o output "\
-        #                "-- ./program.py"
-
       executable = config.value("exec_#{ config_lang }")
-
-      command = %Q{docker run #{ mappings(input_file) }\
-        -m #{ [run.max_memory_kb * 1024, 4 * 1024 * 1024].max }\
-        --cpuset-cpus=0\
-        -u grader -d --net=none grader2\
-         #{ docker_runner } -i #{ docker_input_file } -o #{ docker_output_file }\
-         -p 50 -m #{ run.max_memory_kb * 1024 }\
-         -t #{ run.max_time_ms } --\
-         \"#{ executable }\"}
-
-      puts command
-      container_id = %x{#{ command }}
-      puts "Running #{ executable } in container #{ container_id }"
-
-      run_status = wait_while_finish(container_id)
-
-      puts "Docker logs: #{ docker_logs(container_id) }"
-      puts "Container exit status: #{ run_status }"
-
-      run_status = 127 if docker_oomkilled(container_id)
-
-      # verbose_system "cp #{ local_output_file } ./output"
-        # verbose_system "#{runner} --time #{run.max_time_ms} "\
-        #                "--mem #{run.max_memory_kb} --procs 1 "\
-        #                "--python #{@config[:python_exec]} "\
-        #                "--sandbox-user #{@config[:python_sandbox_user]} "\
-        #                "-i #{base_name} -o output "\
-        #                "-- ./program.py"
-      # else
-      #   verbose_system "#{runner} --time #{run.max_time_ms} "\
-      #                  "--mem #{run.max_memory_kb} --procs 1 "\
-      #                  "-i #{base_name} -o output -- ./program"
-      # end
     end
+
+    command = %Q{docker run #{ mappings(input_file) }\
+      -m #{ [run.max_memory_kb * 1024, 4 * 1024 * 1024].max }\
+      --cpuset-cpus=0\
+      -u grader -d --net=none grader2\
+       #{ docker_runner } -i #{ docker_input_file } -o #{ docker_output_file }\
+       -p 50 -m #{ run.max_memory_kb * 1024 }\
+       -t #{ run.max_time_ms } --\
+       \"#{ executable }\"}
+
+    puts command
+    container_id = %x{#{ command }}
+    puts "Running #{ executable } in container #{ container_id }"
+
+    run_status = wait_while_finish(container_id)
+
+    puts "Docker logs: #{ docker_logs(container_id) }"
+    puts "Container exit status: #{ run_status }"
+
+    run_status = 127 if docker_oomkilled(container_id)
+
     result = "n/a"
 
     case run_status
