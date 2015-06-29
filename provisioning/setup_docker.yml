@@ -1,0 +1,9 @@
+---
+- hosts: all
+  sudo: no
+
+  vars:
+    container_name: grader
+
+  roles:
+    - docker_setup
