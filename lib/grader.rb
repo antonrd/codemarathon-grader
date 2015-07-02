@@ -15,7 +15,7 @@ class Grader
     puts "Ready to grade"
 
     while running do
-      sleep 5 unless process_one_run
+      sleep 1 unless process_one_run
     end
   end
 
@@ -38,29 +38,28 @@ class Grader
   end
 
   def process_one_run
-    found = true
+    run = Run.pending.earliest_first.first
 
-    if run = Run.pending.earliest_first.first
-      if run.task.nil?
-        run.update_attributes(status: Run::STATUS_ERROR,
-          message: "Run with an invalid task requested. Skipped.")
+    return false unless run.present?
+
+    if run.task.nil?
+      run.update_attributes(status: Run::STATUS_ERROR,
+        message: "Run with an invalid task requested. Skipped.")
+    else
+      case run.code
+      when Run::CODE_UPDATE_TASK
+        UpdateTask.new(run, @config).call
+      when Run::CODE_RUN_TASK
+        GradeTask.new(run, @config).call
+      when Run::CODE_UPDATE_CHECKER
+        UpdateChecker.new(run, @config).call
       else
-        case run.code
-        when Run::CODE_UPDATE_TASK
-          UpdateTask.new(run, @config).call
-        when Run::CODE_RUN_TASK
-          GradeTask.new(run, @config).call
-        when Run::CODE_UPDATE_CHECKER
-          UpdateChecker.new(run, @config).call
-        else
-          found = false
-          puts "Run #{run.id} has unknown code #{run.code}"
-          run.update_attributes(status: Run::STATUS_ERROR,
-            message: "Unknown run code. Skipped.")
-        end
+        puts "Run #{run.id} has unknown code #{run.code}"
+        run.update_attributes(status: Run::STATUS_ERROR,
+          message: "Unknown run code. Skipped.")
       end
     end
 
-    found
+    true
   end
 end
