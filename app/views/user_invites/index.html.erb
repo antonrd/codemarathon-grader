@@ -1,0 +1,19 @@
+<table class="table table-striped table-bordered table-hover table-condensed">
+  <tr>
+    <th>Email</th>
+    <th>Created at</th>
+    <th>Cancel</th>
+  </tr>
+  <% @items.each do |item| %>
+    <tr>
+      <td><%= item.user_invite.email %></td>
+      <td><%= item.user_created_at %></td>
+      <td><%= button_to 'Cancel', user_invite_path(item.user_invite), method: :delete %></td>
+    </tr>
+  <% end %>
+</table>
+
+<%= form_for @new_invite, url: {action: "create"}, html: {class: "nifty_form"} do |f| %>
+  <%= f.text_field :email %>
+  <%= f.submit "Add User Invite" %>
+<% end %>

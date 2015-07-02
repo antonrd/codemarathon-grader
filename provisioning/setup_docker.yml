@@ -4,6 +4,7 @@
 
   vars:
     container_name: grader
+    app_root: /home/grader/applications/grader
 
   roles:
     - docker_setup

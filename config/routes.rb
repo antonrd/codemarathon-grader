@@ -1,7 +1,7 @@
 TasksGrader::Application.routes.draw do
   get "users/reset_token"
 
-  devise_for :users
+  devise_for :users, :controllers => { registrations: 'registrations' }
 
   root :to => 'tasks#index'
 
@@ -16,6 +16,8 @@ TasksGrader::Application.routes.draw do
       post 'resubmit'
     end
   end
+
+  resources :user_invites
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

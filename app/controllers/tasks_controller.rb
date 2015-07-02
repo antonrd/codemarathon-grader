@@ -4,6 +4,7 @@ class TasksController < ApplicationController
   before_filter :authenticate_user!, only: [:index]
 
   def index
+    @page_title = 'tasks'
     @tasks = current_user.tasks
   end
 

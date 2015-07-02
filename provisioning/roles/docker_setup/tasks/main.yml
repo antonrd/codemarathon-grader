@@ -2,4 +2,4 @@
 - name: Create Docker.io container
   become: yes
   become_method: sudo
-  shell: bash -lc "docker build -t {{ container_name }} ."
+  shell: docker build -t {{ container_name }} {{ app_root }}

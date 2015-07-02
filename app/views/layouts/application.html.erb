@@ -19,6 +19,7 @@
       <div class="main-menu">
         <span class="<%= 'active' if is_tasks_page? %>"><%= link_to 'Tasks', tasks_path %></span>
         <span class="<%= 'active' if is_runs_page? %>"><%= link_to 'Runs', runs_path %></span>
+        <span class="<%= 'active' if is_invites_page? %>"><%= link_to 'Invites', user_invites_path %></span>
       </div>
     <% else %>
       <div class="pull-left">

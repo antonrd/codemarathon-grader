@@ -4,6 +4,7 @@ class RunsController < ApplicationController
   before_filter :authenticate_user!, only: [:index]
 
   def index
+    @page_title = 'runs'
     @runs = current_user.runs.latest_first
   end
 
