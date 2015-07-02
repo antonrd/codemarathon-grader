@@ -44,3 +44,6 @@ gem 'capistrano', '2.15.4'
 
 # To use debugger
 # gem 'debugger'
+
+gem 'kaminari'
+gem 'bootstrap-kaminari-views'

@@ -5,7 +5,7 @@ class RunsController < ApplicationController
 
   def index
     @page_title = 'runs'
-    @runs = current_user.runs.latest_first
+    @runs = current_user.runs.latest_first.page(params[:page]).per(20)
   end
 
   def create

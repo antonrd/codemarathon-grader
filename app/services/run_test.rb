@@ -24,29 +24,45 @@ class RunTest
   attr_reader :config, :run, :input_file, :answer_file, :config_lang
 
   def run_one_test
-    base_name = Pathname.new(input_file).basename
+    container_id = run_within_docker
+    get_run_status(container_id)
+  end
 
-    run_status = -1
-
+  def run_within_docker
     if run.task.task_type == Task::TASK_TYPE_PYUNIT
       executable = config.value("exec_python_unit")
     else
       executable = config.value("exec_#{ config_lang }")
     end
 
+    memory_limit_bytes = [[run.max_memory_kb, config.value("min_memory_limit_kb")].max, config.value("max_memory_limit_kb")].min * 1024
+    time_limit_seconds = [run.max_time_ms, config.value("max_exec_time_ms")].min / 1000.0
+    max_processes = config.value("max_processes")
+
+    puts "======== Execution limits ========"
+    puts "Memory limit (bytes): #{ memory_limit_bytes }"
+    puts "Memory limit altered by hard grader limits" if memory_limit_bytes != run.max_memory_kb * 1024
+    puts "Time limit (seconds): #{ time_limit_seconds }"
+    puts "Time limit altered by hard grader limits" if time_limit_seconds != run.max_time_ms / 1000.0
+    puts "Maximum processes allowed: #{ max_processes }"
+    puts "======== Execution limits ========"
+
     command = %Q{docker run #{ mappings(input_file) }\
-      -m #{ [run.max_memory_kb * 1024, 4 * 1024 * 1024].max }\
+      -m #{ memory_limit_bytes }\
       --cpuset-cpus=0\
       -u grader -d --net=none grader2\
        #{ docker_runner } -i #{ docker_input_file } -o #{ docker_output_file }\
-       -p 50 -m #{ run.max_memory_kb * 1024 }\
-       -t #{ run.max_time_ms } --\
+       -p #{ max_processes } -m #{ memory_limit_bytes }\
+       -t #{ time_limit_seconds } --\
        \"#{ executable }\"}
 
     puts command
     container_id = %x{#{ command }}
     puts "Running #{ executable } in container #{ container_id }"
+    container_id
+  end
 
+  def get_run_status container_id
     run_status = wait_while_finish(container_id)
 
     puts "Docker logs: #{ docker_logs(container_id) }"
@@ -67,7 +83,7 @@ class RunTest
         result = "re"
     end
 
-    return result
+    result
   end
 
   def mappings(input_file)

@@ -32,6 +32,9 @@ GEM
       execjs
       json
     bcrypt (3.1.10)
+    bootstrap-kaminari-views (0.0.5)
+      kaminari (>= 0.13)
+      rails (>= 3.1)
     bootstrap-sass (3.3.4.1)
       autoprefixer-rails (>= 5.0.0.1)
       sass (>= 3.2.19)
@@ -71,6 +74,9 @@ GEM
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
     json (1.8.2)
+    kaminari (0.16.3)
+      actionpack (>= 3.0.0)
+      activesupport (>= 3.0.0)
     kgio (2.9.3)
     mail (2.5.4)
       mime-types (~> 1.16)
@@ -144,6 +150,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bootstrap-kaminari-views
   bootstrap-sass (~> 3.3.4)
   byebug
   capistrano (= 2.15.4)
@@ -152,6 +159,7 @@ DEPENDENCIES
   foreman (~> 0.63.0)
   jquery-rails
   json (= 1.8.2)
+  kaminari
   mysql2 (~> 0.3.11)
   rails (= 4.1.2)
   sass-rails (~> 5.0)
