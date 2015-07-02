@@ -61,5 +61,3 @@
 # https://github.com/mitchellh/vagrant/issues/3341
 # https://docs.docker.com/installation/ubuntulinux/#installing-docker-on-ubuntu (for Grub, to handle memory limits)
 # https://help.ubuntu.com/community/SSH/OpenSSH/Keys (ssh keys)
-
-# TODO: Set up docker container for grader!

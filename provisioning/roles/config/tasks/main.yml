@@ -39,9 +39,3 @@
   become: yes
   become_method: sudo
   shell: bash -lc "start {{ app_name }}"
-
-# - name: Create symlink for unicorn config
-#   file: src="{{ app_root }}"/config/unicorn_init.sh dest=/etc/init.d/unicorn_"{{ app_name }}" state=link
-
-# - name: Create symlink for nginx config
-#   file: src="{{ app_root }}"/config/nginx.conf dest=/etc/nginx/sites-enabled/"{{ app_name }}" state=link
