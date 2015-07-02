@@ -7,7 +7,7 @@
 - name: Start nginx
   become: yes
   become_method: sudo
-  shell: bash -lc "nginx -s start"
+  service: name=nginx state=started
 
 - name: Start grader rake task
   become: yes

@@ -7,7 +7,7 @@
 - name: Stop nginx
   become: yes
   become_method: sudo
-  shell: bash -lc "nginx -s stop"
+  service: name=nginx state=stopped
 
 - name: Stop grader rake task
   become: yes

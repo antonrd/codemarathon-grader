@@ -7,7 +7,8 @@
 - name: Restart nginx
   become: yes
   become_method: sudo
-  shell: bash -lc "nginx -s reload"
+  service: name=nginx state=restarted
+  # shell: bash -lc "nginx -s reload"
 
 - name: Restart grader rake task
   become: yes
