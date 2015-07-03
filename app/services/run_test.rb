@@ -80,13 +80,13 @@ class RunTest
 
     case run_status
       when 9
-        result = RUN::TEST_OUTCOME_TIME_LIMIT
+        result = Run::TEST_OUTCOME_TIME_LIMIT
       when 127
-        result = RUN::TEST_OUTCOME_MEMORY_LIMIT
+        result = Run::TEST_OUTCOME_MEMORY_LIMIT
       when 0
         result = check_output(run, local_output_file, answer_file, input_file)
       else
-        result = RUN::TEST_OUTCOME_RUNTIME_ERROR
+        result = Run::TEST_OUTCOME_RUNTIME_ERROR
     end
 
     result
