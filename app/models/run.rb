@@ -12,6 +12,13 @@ class Run < ActiveRecord::Base
     STATUS_ERROR = "unknown error"
     STATUS_GRADER_ERROR = "grader error"
     STATUS_SUCCESS = "success"
+
+    TEST_OUTCOME_TIME_LIMIT = 'tl'
+    TEST_OUTCOME_MEMORY_LIMIT = 'ml'
+    TEST_OUTCOME_RUNTIME_ERROR = 're'
+    TEST_OUTCOME_WRONG_ANSWER = 'wa'
+    TEST_OUTCOME_OK = 'ok'
+    TEST_OUTCOME_GRADER_ERROR = 'ge'
   end
 
   include Constants

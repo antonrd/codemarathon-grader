@@ -95,10 +95,13 @@ class GradeTask
     end
 
     # for each test, run the program
-    message = input_files.zip(output_files).map { |input_file, answer_file|
-      RunTest.new(config, run, input_file, answer_file, language).call
-    }.join(" ")
+    test_outcomes = []
+    input_files.zip(output_files).map do |input_file, answer_file|
+      test_outcome = RunTest.new(config, run, input_file, answer_file, language).call
+      return [Run::STATUS_GRADER_ERROR, "The grader seems to be out of order"] if test_outcome == Run::TEST_OUTCOME_GRADER_ERROR
+      test_outcomes << test_outcome
+    end
 
-    [Run::STATUS_SUCCESS, message]
+    [Run::STATUS_SUCCESS, test_outcomes.join(" ")]
   end
 end

@@ -50,7 +50,7 @@ class RunTest
     command = %Q{docker run #{ mappings(input_file) }\
       -m #{ memory_limit_bytes }\
       --cpuset-cpus=0\
-      -u grader -d --net=none grader2\
+      -u #{ docker_container_user } -d --net=none #{ docker_image_name }\
        #{ docker_runner } -i #{ docker_input_file } -o #{ docker_output_file }\
        -p #{ max_processes } -m #{ memory_limit_bytes }\
        -t #{ time_limit_seconds } --\
@@ -58,11 +58,17 @@ class RunTest
 
     puts command
     container_id = %x{#{ command }}
-    puts "Running #{ executable } in container #{ container_id }"
-    container_id
+    if container_id.strip.blank?
+      puts "Failed running #{ executable } in a docker container"
+    else
+      puts "Running #{ executable } in container #{ container_id }"
+    end
+    container_id.strip
   end
 
   def get_run_status container_id
+    return Run::TEST_OUTCOME_GRADER_ERROR if container_id.blank?
+
     run_status = wait_while_finish(container_id)
 
     puts "Docker logs: #{ docker_logs(container_id) }"
@@ -74,13 +80,13 @@ class RunTest
 
     case run_status
       when 9
-        result = "tl"
+        result = RUN::TEST_OUTCOME_TIME_LIMIT
       when 127
-        result = "ml"
+        result = RUN::TEST_OUTCOME_MEMORY_LIMIT
       when 0
         result = check_output(run, local_output_file, answer_file, input_file)
       else
-        result = "re"
+        result = RUN::TEST_OUTCOME_RUNTIME_ERROR
     end
 
     result
@@ -104,6 +110,14 @@ class RunTest
     end
 
     docker_exitcode(container_id)
+  end
+
+  def docker_container_user
+    config.value('docker_container_user')
+  end
+
+  def docker_image_name
+    config.value('docker_image_name')
   end
 
   def docker_running_state(container_id)
@@ -161,8 +175,6 @@ class RunTest
   def check_output(run, output_file, answer_file, input_file)
     puts "Checking output..."
     if run.task.checker
-      # file_extension = config.value("extension_#{run.task.checker}")
-      # checker = File.join(config[:files_root], config[:sync_to], run.task_id.to_s, "checker.#{file_extension}")
       verbose_system "#{run.task.checker} #{input_file} #{answer_file} #{output_file}"
     else
       checker = "ruby " + Rails.root.join("lib/execs/diff.rb").to_s
@@ -170,9 +182,9 @@ class RunTest
     end
 
     if $?.exitstatus != 0
-      "wa"
+      Run::TEST_OUTCOME_WRONG_ANSWER
     else
-      "ok"
+      Run::TEST_OUTCOME_OK
     end
   end
 end

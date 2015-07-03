@@ -1,50 +1,46 @@
 development:
-  languages: c++;java
+  languages: cpp;java;python;ruby
+
+test:
+  languages: cpp;java;python;ruby
+
+production:
+  languages: cpp;java;python;ruby
+  compiled_languages: cpp;java
   input_file_pattern: input.*.txt
-  output_file_pattern: solve.*.txt
+  output_file_pattern: output.*.txt
   sync: rsync -azv -e ssh
   files_root: /home/vagrant/grader_root
   sync_to: sets
   runs_dir: runs
-  compile_cpp: g++ %s.cpp -o %s -O2
-  compile_java: gcj --main=program %s.java -o %s
-  runner_cpp: isolate_runner.rb
-  runner_java: isolate_runner.rb
-  init_cpp: sudo rm -f output; sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
-  # run_cpp: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
-  cleanup_cpp: cat stat; sudo cp /tmp/box/0/box/output .; head -2 output; sudo ~/moe_sandbox/run/bin/isolate --cleanup
-  init_java: sudo rm -f output; sudo ~/moe_sandbox/run/bin/isolate --init; sudo cp program %s /tmp/box/0/box
-  # run_java: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
-  cleanup_java: cat stat; sudo cp /tmp/box/0/box/output .; head -2 output; sudo ~/moe_sandbox/run/bin/isolate --cleanup
-  python_exec: /home/deployer/codemarathon-sandbox/bin/python
-  python_sandbox_user: sandbox
-  init_python:
-test:
-  languages: c++;java
-  input_file_pattern: input.*.txt
-  output_file_pattern: solve.*.txt
-  sync: cp
-  files_root: /Users/pierrelombard/tmp
-  sync_to: sets
-  runs_dir: runs
-  run_cpp: ./program < %s > output
-  run_java: java program < %s > output
-production:
-  languages: c++;java
-  input_file_pattern: input.*.txt
-  output_file_pattern: solve.*.txt
-  sync: rsync -azv -e ssh %s %s
-  files_root: /home/deployer/grader_root
-  sync_to: sets
-  runs_dir: runs
-  compile_cpp: g++ %s.cpp -o %s -O2
-  compile_java: gcj --main=program %s.java -o %s
-  runner: isolate_runner.rb
-  init_cpp: sudo rm -f output; sudo /home/deployer/isolate --init; sudo cp program %s /tmp/box/0/box
-  # run_cpp: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
-  cleanup_cpp: cat stat; sudo cp /tmp/box/0/box/output .; head -2 output; sudo /home/deployer/isolate --cleanup
-  init_java: sudo rm -f output; sudo /home/deployer/isolate --init; sudo cp program %s /tmp/box/0/box
-  # run_java: sudo ~/moe_sandbox/run/bin/isolate --mem=30 --time=1 --meta=metadata.txt --stdin=%s --stdout=output --run -- program
-  cleanup_java: cat stat; sudo cp /tmp/box/0/box/output .; head -2 output; sudo /home/deployer/isolate --cleanup
-  python_exec: /home/deployer/codemarathon-sandbox/bin/python
-  python_sandbox_user: sandbox
+  sandbox_dir: /sandbox
+
+  file_basename: program
+  extension_cpp: cpp
+  extension_java: java
+  extension_python: py
+  extension_ruby: rb
+
+  compile_cpp: g++ %s -o %s -O2
+  compile_java: gcj --main=program %s -o %s
+
+  runner_cpp: runner_fork.rb
+  runner_java: runner_fork.rb
+  runner_python: runner_fork.rb
+  runner_ruby: runner_fork.rb
+
+  exec_cpp: ./program
+  exec_java: ./program
+  exec_python: /usr/bin/python2.7 ./program.py
+  exec_ruby: /usr/bin/ruby ./program.rb
+  # Used to run Python unit tests. May be generalized in the future when
+  # unit tests are added for more languages
+  exec_python_unit: /usr/bin/python2.7 ./wrapper_code.py
+
+  min_memory_limit_kb: 4096
+  max_memory_limit_kb: 262144
+  max_exec_time_ms: 5000
+  max_processes: 50
+
+  docker_container_user: grader
+  docker_image_name: grader
