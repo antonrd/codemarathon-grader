@@ -39,3 +39,5 @@
   become: yes
   become_method: sudo
   shell: bash -lc "start {{ app_name }}"
+
+# Grader rake logs will go to /var/log/codemarathon_grader/worker-1.log
