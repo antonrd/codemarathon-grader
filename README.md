@@ -20,17 +20,17 @@ Hence, the grader can be used by external services, which can communicate with i
 
 The grader stores data about user accounts and created tasks in a database.
 
-It runs the programs in a Docker container to achieve sandboxing. In order to put some additional limitations it uses a runner, which was taken from the Maycamp Arena.
+It runs the programs in a [Docker](https://www.docker.com/) container to achieve sandboxing. In order to put some additional limitations it uses a runner, which was taken from the Maycamp Arena.
 
 Hopefully, this combination of the runner and Docker will allow the grader to sandbox the programs it runs well enough to limit their resource usage and any undesired behavior.
 
 In order to upload inputs/outputs to the grader the API users need to define a path on a server, where the files can be found. They will need to add the grader's public key in their `authorized_keys` file to allow it to fetch the files using [rsync](https://rsync.samba.org/) whenever needed.
 
-Once the files are fetched they get stored on the same machine where the grader is running. This whole process of moving and storing files around needs to be improves in the future to make it more secure and fail proof.
+Once the files are fetched they get stored on the same machine where the grader is running. This whole process of moving and storing files around needs to be improved in the future to make it more secure and fail proof.
 
-The grader uses the sendmail utility to send some emails. There is a small tweak needed to make this work fast. It's described below.
+The grader uses the `sendmail` utility to send some emails. There is a small tweak needed to make this work fast. It's described below.
 
-In order to execute the requested task runs there is a rake task, which is run separately and constantly checks the database for pending runs. It sleeps for 1 second if nothing is found and checks again. In production running the Rails app and the rake task is handled by [upstart](http://upstart.ubuntu.com/). It gets set up by the deployment scripts.
+In order to execute the requested task runs there is a rake task (`grader:start`), which is run separately and constantly checks the database for pending runs. It sleeps for 1 second if nothing is found and checks again. In production running the Rails app and the rake task is handled by [upstart](http://upstart.ubuntu.com/). It gets set up by the deployment scripts.
 
 ### Sanboxing
 
@@ -138,8 +138,15 @@ The architecture of the grader makes it possible to run programs in virutally an
 
 ### How to use it?
 
-Run regular tasks and unit tests.
+The grader accepts either whole programs or for Python - one method's contents (unit tests). The whole program mode accepts a whole valid program in each of the supported langauges and runs it in a stand-alone mode.
+
+The unit test mode is for tasks for which the API client (or task author) has supplied a wrapper program, which is written in such way so that it calls a given method and processes its result. The method can accept parameters and the solution to such problems must contain the expected method with implementation in it. **NOTE:** This is only available for Python at the moment but should be easily extendable to the other languages, too.
+
+There are example Ruby and shell scripts in the directory `sample_api_calls`, which will allow you to test using the API of a running grader. These scripts simulate all possible API calls (as of 2015-07-27), you just need to tweak the params they send with the requests to match what you have in your version of the grader.
 
 ### TODO list
 * Make it easier to bootstrap the user creation.
 * Run compilation in the sandbox, too.
+* Think of a better way to handle file uploads for tasks
+* Allow other methods for sending email
+* Make it possible to run unit tests for all languages
