@@ -90,7 +90,9 @@ As mentioned above each API client of the grader will need to have its public ke
 
 ### Deployment
 
-Hoepfully, after all the prerequisites are completed you will be able to run a few Ansible scripts and complete the deployment.
+Hopefully, after all the prerequisites are completed you will be able to run a few Ansible scripts and complete the deployment.
+
+The Rails app is being served using a combination of [Unicorn](http://unicorn.bogomips.org/) and [nginx](http://nginx.org/). The database is MySql for the moment. Docker is used for sandboxing. Sendmail is used for sending emails.
 
 First of all you need to run from the root of the project:
 
