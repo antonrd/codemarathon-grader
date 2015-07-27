@@ -1,12 +1,12 @@
-== CodeMarathon Grader
+## CodeMarathon Grader
 
-=== Overview
+### Overview
 
 The CodeMarathon Grader is a system that can be used to execute programs or parts of programs written is several programming languages against a predefined set of inputs and to check the produced outputs.
 
 It has been inspired a lot by a related project called [the Maycamp Arena](https://github.com/valo/maycamp_arena). Many of the ideas laid down in it are used in the CodeMarathon Grader. However, this grader's goal is to be more universal in terms of how it can be used and what programming languages it can support.
 
-=== Tasks execution
+### Tasks execution
 
 The idea is to keep each program execution in a sandboxed environment by limiting the CPU and memory used as well as suppress some other capabilities of the programs.
 
@@ -16,7 +16,7 @@ To achieve this the grader runs as a Rails app and exposes a RESTful API, which 
 
 Hence, the grader can be used by external services, which can communicate with it through the API. To do this one needs a registered account and a secret key.
 
-=== Components
+### Components
 
 The grader stores data about user accounts and created tasks in a database.
 
@@ -32,7 +32,7 @@ The grader uses the sendmail utility to send some emails. There is a small tweak
 
 In order to execute the requested task runs there is a rake task, which is run separately and constantly checks the database for pending runs. It sleeps for 1 second if nothing is found and checks again. In production running the Rails app and the rake task is handled by [upstart](http://upstart.ubuntu.com/). It gets set up by the deployment scripts.
 
-=== Sanboxing
+### Sanboxing
 
 As mentioned above this version of the grader uses a combination of Docker containers and a runner script, which together are supposed to limit CPU and memory according to some pre-set values. Some other things like network connectivity should be limited by Docker. Forking is not exactly forbidden although it is possible to limit the number of processes. The reason is that some languages rely on having more than one thread/process running and this could break them.
 
@@ -40,7 +40,9 @@ In a previous version of the grader when it was supporting C++, Java (through gc
 
 With time, in order to unify things we switched to using the current solution taken from Maycamp's Arena. It has been working there well for a while now and seems to be giving more flexibility in adding more languages to the platform.
 
-=== Deployment prerequisites
+Compilation is not yet run in a sandbox but it seems like a good idea to do that. This is a future task.
+
+### Deployment prerequisites
 
 To make deployment easier the grader contains some [Ansible](http://www.ansible.com/home) scripts. It is possible that this README misses some details of how deployment should be done but overall it describes the idea.
 
@@ -86,7 +88,7 @@ Host host_name
 
 As mentioned above each API client of the grader will need to have its public key in the autorized_keys file (e.g. `~/.ssh/authorized_keys`) in order to be able to send it files.
 
-=== Deployment
+### Deployment
 
 Hoepfully, after all the prerequisites are completed you will be able to run a few Ansible scripts and complete the deployment.
 
@@ -110,15 +112,15 @@ Finally, use the tasks for starting/stopping/restarting the application. The fir
 
 **IMPORTANT!:** For the moment the grader allows creation of new accounts only if there is an invite for them. You will need to create one manually in the database. You can use the Rails console (`rails c`) to do this. After that you should be able to register a new user with the invited email address and manage this process from the web interface of the grader. In the future this will be made more convenient hopefully.
 
-=== Running in Vagrant
+### Running in Vagrant
 
 There is also a `Vagrantfile` file in the root of the project for running the grader in a Vagrant virtual box. This is useful if you're developing using a OS different from Ubuntu. You may need to tweak some of the Ansible scripts to make this work for you because the Vagrant file references these scripts in order to setup a box for you.
 
-=== Configuration
+### Configuration
 
 All configuration for the grader lives in the file `config/grader.yml`. It has sections according to Rails environments and defines important aspects of the grader's operation. There are comments about most fields about what they are about.
 
-=== Client setup
+### Client setup
 
 A client of the grader is expected to have a registered account, which is done through the web UI. There should be user invite create for the email address with which the new client will subscribe. New accounts are confirmed through a link sent to the email of the client.
 
@@ -128,15 +130,16 @@ In order to upload inputs/outputs for tasks the client needs to specify in their
 
 It is also possible to have a set up in which the client runs on the same machine as the grader and the files are just moved around locally.
 
-=== Supported languages
+### Supported languages
 
 For the moment the supported languages are C++, Java (through gcj), Python and Ruby. For Python there is a special mode in which the code for one particular method can be submitted. Read more about this mode in the section about using the grader.
 
 The architecture of the grader makes it possible to run programs in virutally any language that has a compiler or interpreter. However, it is important to research how well the sandbox works for each separate case. Even the support for the current languages may have vulnerabilities. Please report if any such are found.
 
-=== How to use it?
+### How to use it?
 
 Run regular tasks and unit tests.
 
-=== TODO list
+### TODO list
 * Make it easier to bootstrap the user creation.
+* Run compilation in the sandbox, too.
