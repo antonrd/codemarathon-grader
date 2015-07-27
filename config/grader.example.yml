@@ -5,30 +5,42 @@ test:
   languages: cpp;java;python;ruby
 
 production:
+  # Allowed languages separated by ;
   languages: cpp;java;python;ruby
+  # Languages, which require compilation, need corresponding `compile_*` value
   compiled_languages: cpp;java
+  # The filename pattern for input files
   input_file_pattern: input.*.txt
+  # The filename pattern for output files
   output_file_pattern: output.*.txt
+  # The command used to get files from the remote client machine
   sync: rsync -azv -e ssh
+  # The directory where retrieved inputs/outputs are stored. Also used for the sandbox execution
   files_root: /home/vagrant/grader_root
+  # Directory within `files_root` where the inputs/outputs are stored
   sync_to: sets
-  runs_dir: runs
+  # Directory within the Docker container where programs are run and is mapped to the directory on the host
   sandbox_dir: /sandbox
 
+  # Filename for executable programs
   file_basename: program
+  # Extensions for various source code files
   extension_cpp: cpp
   extension_java: java
   extension_python: py
   extension_ruby: rb
 
+  # Commands for compiling compilable languages
   compile_cpp: g++ %s -o %s -O2
   compile_java: gcj --main=program %s -o %s
 
+  # Runner programs used for various languages
   runner_cpp: runner_fork.rb
   runner_java: runner_fork.rb
   runner_python: runner_fork.rb
   runner_ruby: runner_fork.rb
 
+  # Program to execute for various languages
   exec_cpp: ./program
   exec_java: ./program
   exec_python: /usr/bin/python2.7 ./program.py
@@ -37,10 +49,13 @@ production:
   # unit tests are added for more languages
   exec_python_unit: /usr/bin/python2.7 ./wrapper_code.py
 
+  # Defines absolute minimum and maximum allowed resources
   min_memory_limit_kb: 4096
   max_memory_limit_kb: 262144
   max_exec_time_ms: 5000
   max_processes: 50
 
+  # User used within the Docker containers
   docker_container_user: grader
+  # Name of the Docker image used
   docker_image_name: grader
