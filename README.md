@@ -6,7 +6,7 @@ The CodeMarathon Grader is a system that can be used to execute programs or part
 
 It has been inspired a lot by a related project called [the Maycamp Arena](https://github.com/valo/maycamp_arena). Many of the ideas laid down in it are used in the CodeMarathon Grader. However, this grader's goal is to be more universal in terms of how it can be used and what programming languages it can support.
 
-A working version of the system can be found here: [grader.codemarathon.com].
+A working version of the system can be found here: [grader.codemarathon.com](grader.codemarathon.com).
 
 ### Tasks execution
 
