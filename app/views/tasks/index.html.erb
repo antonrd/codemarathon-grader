@@ -12,10 +12,10 @@
     <% @tasks.each do |task| %>
       <tr>
         <td><%= task.id %></td>
-        <td><%= task.name %></td>
+        <td><%= link_to task.name, task_path(task) %></td>
         <td><%= task.task_type %></td>
         <td><%= task.checker.present? ? task.checker : 'Default' %></td>
-        <td><%= task.description %></td>
+        <td><%= render inline: task.description %></td>
       </tr>
     <% end %>
   </table>

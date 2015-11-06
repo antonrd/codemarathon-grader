@@ -102,15 +102,17 @@ First of all you need to run from the root of the project:
 
 This will install the needed packages and configure some of them whenever needed. See more details about this step in the `install` and `config` Ansible roles.
 
-After that you need to proceed with the deployment, which will fetch the latest code from Github, install gems, run migrations and precompile the assets.
-
-You need to create the `config/grader.yml` file and make sure it contains the right values. You can use the `config/grader.example/yml` file as basis. More about this config file is included below.
-
 You also need to set up the Docker image, which will be used to create containers. This can be done by running:
 
 `ansible-playbook ./provisioning/setup_docker.yml -i ./provisioning/production.ini`
 
 This will use the `Dockerfile` available in the root of the project.
+
+After that you need to proceed with the deployment, which will fetch the latest code from Github, install gems, run migrations and precompile the assets:
+
+`ansible-playbook ./provisioning/deploy_production.yml -i ./provisioning/production.ini`
+
+You need to create the `config/grader.yml` file and make sure it contains the right values. You can use the `config/grader.example/yml` file as basis. More about this config file is included below.
 
 Finally, use the tasks for starting/stopping/restarting the application. The first time a start would be sufficient. After subsequent deploys a restart is more suitable.
 
@@ -119,6 +121,8 @@ Finally, use the tasks for starting/stopping/restarting the application. The fir
 ### Running in Vagrant
 
 There is also a `Vagrantfile` file in the root of the project for running the grader in a Vagrant virtual box. This is useful if you're developing using a OS different from Ubuntu. You may need to tweak some of the Ansible scripts to make this work for you because the Vagrant file references these scripts in order to setup a box for you.
+
+After Rails 4.2 the server is only serving on `127.0.0.1`, not on `0.0.0.0` as before. This may be an issue for the port forwarding feature in Vagrant and VirtualBox. If this is not working for you, try running the server like that `rails s -p XXXX -b 0.0.0.0`.
 
 ### Configuration
 

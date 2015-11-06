@@ -1,0 +1,40 @@
+<div class="col-md-8 col-md-offset-2">
+  <h3 class="text-center">Task "<%= @task.name %>"</h3>
+  <% if @tests.empty? %>
+    No tests yet
+  <% else %>
+    <div class="panel panel-primary">
+      <div class="panel-heading">Tests</div>
+      <div class="panel-body">
+        <table class="table table-striped table-hover table-condensed">
+          <% @tests.each do |test| %>
+            <tr>
+              <td><%= test[:file_basename] %></td>
+              <td><%= test[:file_size] %> bytes</td>
+              <td><%= button_to "Delete", delete_test_task_path(@task, file_name: test[:file_basename]), method: :post %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <%= button_to "Delete all tests", delete_tests_task_path(@task), method: :post %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">Upload tests</div>
+    <div class="panel-body">
+      <%= form_for @task, url: upload_tests_task_path(@task), method: :post do |f| %>
+        <div class="row">
+          <div class="col-md-4">
+            <%= f.file_field :test_cases, multiple: true %>
+          </div>
+          <div class="col-md-2">
+            <%= f.submit "Upload test cases" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

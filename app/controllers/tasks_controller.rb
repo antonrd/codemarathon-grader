@@ -1,7 +1,7 @@
 class TasksController < ApplicationController
 
-  before_filter :restrict_access, except: [:index]
-  before_filter :authenticate_user!, only: [:index]
+  before_filter :restrict_access, except: [:index, :show, :upload_tests, :delete_tests, :delete_test]
+  before_filter :authenticate_user!, except: [:create, :update_task]
 
   def index
     @page_title = 'tasks'
@@ -44,7 +44,30 @@ class TasksController < ApplicationController
     end
   end
 
-  private
+  def show
+    @task = Task.find(params[:id])
+    @tests = TaskFileManager.new(@task).file_list
+  end
+
+  def upload_tests
+    @task = Task.find(params[:id])
+    TaskFileManager.new(@task).upload_tests(params[:task][:test_cases]) if !params[:task][:test_cases].blank?
+    redirect_to task_path(@task)
+  end
+
+  def delete_tests
+    @task = Task.find(params[:id])
+    TaskFileManager.new(@task).delete_tests
+    redirect_to task_path(@task)
+  end
+
+  def delete_test
+    @task = Task.find(params[:id])
+    TaskFileManager.new(@task).delete_test(params[:file_name])
+    redirect_to task_path(@task)
+  end
+
+  protected
 
   def task_params
     params.require(:task).permit(:name, :description, :task_type, :wrapper_code)

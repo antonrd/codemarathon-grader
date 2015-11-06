@@ -2,8 +2,8 @@ require 'json'
 require 'net/http'
 require 'uri'
 
-uri = URI('http://localhost:3030/runs')
-access_token = "ca338c89b83f8a153f2f95149ff51e17"
+uri = URI('http://localhost:6543/runs')
+access_token = "0cbbf77d7b85d83fdaa848c654566b4b"
 headers = { "Authorization" => "Token token=\"#{access_token}\"" }
 req = Net::HTTP::Post.new(uri, headers)
 
@@ -16,7 +16,7 @@ source_code_rb = """
 #sleep 3
 #loop { fork }
 arr = []
-1000000000.times do
+1000.times do
   arr << rand(1400)
 end
 puts 'Hello world!'
@@ -42,18 +42,18 @@ int main(void)
 """
 
 # data_hash = {"source_code" => "", "lang" => "cpp"}
-data_hash = {"source_code" => source_code_cpp, "lang" => "cpp"}
-# data_hash = {"source_code" => "class program {public static void main(String[] args) { System.out.println(\"Hello world!\"); }}", "lang" => "java"}
+# data_hash = {"source_code" => source_code_cpp, "lang" => "cpp"}
+data_hash = {"source_code" => "class program {public static void main(String[] args) { System.out.println(\"Hello world!\"); }}", "lang" => "java"}
 # data_hash = {"source_code" => source_code_py, "lang" => "python"}
 # data_hash = {"source_code" => source_code_rb, "lang" => "ruby"}
 # data_hash = {"source_code" => "print \"Hello\"", "lang" => "python"}
 
 args = {
-  "email" => 'dimitrov.anton@gmail.com',
-  "run[task_id]" => 1,
+  "email" => 'anton@codemarathon.com',
+  "run[task_id]" => 3,
   "run[code]" => "run_task",
   "run[data]" => data_hash.to_json,
-  "run[max_memory_kb]" => 20000,
+  "run[max_memory_kb]" => 500000000,
   "run[max_time_ms]" => 5000}
 
 req.set_form_data(args)

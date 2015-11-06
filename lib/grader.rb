@@ -19,7 +19,7 @@ class Grader
     end
   end
 
-  private
+  protected
 
   attr_reader :config, :running
 
@@ -48,11 +48,11 @@ class Grader
     else
       case run.code
       when Run::CODE_UPDATE_TASK
-        UpdateTask.new(run, @config).call
+        UpdateTask.new(run, config).call
       when Run::CODE_RUN_TASK
-        GradeTask.new(run, @config).call
+        GradeTask.new(run, config).call
       when Run::CODE_UPDATE_CHECKER
-        UpdateChecker.new(run, @config).call
+        UpdateChecker.new(run, config).call
       else
         puts "Run #{run.id} has unknown code #{run.code}"
         run.update_attributes(status: Run::STATUS_ERROR,

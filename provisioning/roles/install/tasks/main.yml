@@ -17,6 +17,7 @@
     - g++
     - gcj-jdk
     - linux-image-generic-lts-trusty
+    - libgmp-dev
 
 - name: RVM public key
   # This fails sometimes, needs reruning

@@ -25,6 +25,9 @@
 # VM: 127.0.0.1 grader.codemarathon.com localhost grader.codemarathon.com
 # Vagrant: 127.0.0.1 localhost.localdomain localhost vagrant-ubuntu-trusty-64
 
+# Add user to 'docker' group in order to be able to run commands without sudo:
+# https://docs.docker.com/installation/ubuntulinux/
+
 # Locally fix ~/.ssh/config to do forwarding of keys:
 # Host codemarathon
 #    ...

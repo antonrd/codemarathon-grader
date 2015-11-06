@@ -8,6 +8,9 @@ TasksGrader::Application.routes.draw do
   resources :tasks do
     member do
       post "update_task"
+      post "upload_tests"
+      post "delete_tests"
+      post "delete_test"
     end
   end
 
