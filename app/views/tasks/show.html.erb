@@ -28,7 +28,7 @@
       <%= form_for @task, url: upload_tests_task_path(@task), method: :post do |f| %>
         <div class="row">
           <div class="col-md-4">
-            <%= f.file_field :test_cases, multiple: true %>
+            <%= f.file_field :test_cases, multiple: true, required: true %>
           </div>
           <div class="col-md-2">
             <%= f.submit "Upload test cases" %>
