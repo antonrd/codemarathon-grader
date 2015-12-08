@@ -11,7 +11,7 @@ class Run < ActiveRecord::Base
     STATUS_CE = "compilation error"
     STATUS_ERROR = "unknown error"
     STATUS_GRADER_ERROR = "grader error"
-    STATUS_SUCCESS = "success"
+    STATUS_SUCCESS = "finished"
 
     TEST_OUTCOME_TIME_LIMIT = 'tl'
     TEST_OUTCOME_MEMORY_LIMIT = 'ml'
