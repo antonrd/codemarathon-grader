@@ -32,7 +32,7 @@ production:
 
   # Commands for compiling compilable languages
   compile_cpp: g++ %s -o %s -O2
-  compile_java: gcj --main=program %s -o %s
+  compile_java: javac %s
 
   # Runner programs used for various languages
   runner_cpp: runner_fork.rb
@@ -42,7 +42,7 @@ production:
 
   # Program to execute for various languages
   exec_cpp: ./program
-  exec_java: ./program
+  exec_java: java -Xmx512m program
   exec_python: /usr/bin/python2.7 ./program.py
   exec_ruby: /usr/bin/ruby ./program.rb
   # Used to run Python unit tests. May be generalized in the future when
