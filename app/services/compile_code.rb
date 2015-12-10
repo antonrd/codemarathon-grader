@@ -11,6 +11,10 @@ class CompileCode
   end
 
   def call
+    puts "====== BEGIN Source code======="
+    puts source_code
+    puts "====== END Source code======="
+
     File.open(full_source_name, "w") do |f|
       f.write(source_code)
     end
