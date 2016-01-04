@@ -175,7 +175,7 @@ class RunTest
   def check_output(run, output_file, answer_file, input_file)
     puts "Checking output..."
     if run.task.checker
-      verbose_system "#{run.task.checker} #{input_file} #{answer_file} #{output_file}"
+      verbose_system "#{checker_exectutable(run.task.checker)} #{input_file} #{answer_file} #{output_file}"
     else
       checker = "ruby " + Rails.root.join("lib/execs/diff.rb").to_s
       verbose_system "#{checker} #{answer_file} #{output_file}"
@@ -186,5 +186,10 @@ class RunTest
     else
       Run::TEST_OUTCOME_OK
     end
+  end
+
+  def checker_exectutable checker_path
+    exec_checker_config_key = "exec_#{ config_lang }_checker"
+    ["#{ config.value(exec_checker_config_key) }", checker_path].join(" ")
   end
 end

@@ -27,6 +27,7 @@ class UpdateChecker
   def update_checker
     # TODO: Change this to be run in the sandbox using docker maybe.
     run_dir = File.join(config.value(:files_root), config.value(:sync_to), run.task_id.to_s)
+    FileUtils.mkdir_p(run_dir)
 
     Dir.chdir(run_dir) do
       RedirectOutput.new(LOG_FILE).call do

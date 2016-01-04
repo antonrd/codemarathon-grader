@@ -15,7 +15,28 @@
         <td><%= link_to task.name, task_path(task) %></td>
         <td><%= task.task_type %></td>
         <td><%= task.checker.present? ? task.checker : 'Default' %></td>
-        <td><%= render inline: task.description %></td>
+        <td>
+          <div class="modal fade" id="task-description-<%= task.id %>" tabindex="-1" role="dialog" aria-labelledby="task-description-<%= task.id %>-label">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="task-description-<%= task.id %>-label">Task "<%= task.name %>" description</h4>
+                </div>
+                <div class="modal-body">
+                  <%= render inline: task.description %>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="#" data-toggle="modal" data-target="#task-description-<%= task.id %>">
+            <%= truncate(task.description, length: 50) %>
+          </a>
+        </td>
       </tr>
     <% end %>
   </table>

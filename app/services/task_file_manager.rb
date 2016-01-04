@@ -34,7 +34,7 @@ class TaskFileManager
 
   def file_list
     destination_path = File.join(config.value(:files_root),
-      config.value(:sync_to), task.id.to_s, '*')
+      config.value(:sync_to), task.id.to_s, '*.txt')
 
     Dir[destination_path].map { |file_path| describe_file(file_path) }.sort { |a, b| a[:file_basename] <=> b[:file_basename] }
   end
@@ -42,7 +42,7 @@ class TaskFileManager
   def delete_tests
     Dir[File.join(config.value(:files_root),
       config.value(:sync_to), task.id.to_s, '*')].each do |file_name|
-      delete_test_by_full_path(full_path)
+      delete_test_by_full_path(file_name)
     end
   end
 
