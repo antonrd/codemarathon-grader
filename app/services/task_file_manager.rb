@@ -41,7 +41,7 @@ class TaskFileManager
 
   def delete_tests
     Dir[File.join(config.value(:files_root),
-      config.value(:sync_to), task.id.to_s, '*')].each do |file_name|
+      config.value(:sync_to), task.id.to_s, '*.txt')].each do |file_name|
       delete_test_by_full_path(file_name)
     end
   end

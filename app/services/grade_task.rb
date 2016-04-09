@@ -82,9 +82,9 @@ class GradeTask
 
   def run_tests(run, language)
     input_file_pat = File.join(config.value(:files_root), config.value(:sync_to), run.task_id.to_s, config.value(:input_file_pattern))
-    input_files = Dir.glob(input_file_pat).sort
+    input_files = Dir.glob(input_file_pat).sort_by { |file_name| file_name.split(".")[1].to_i }
     output_file_pat = File.join(config.value(:files_root), config.value(:sync_to), run.task_id.to_s, config.value(:output_file_pattern))
-    output_files = Dir.glob(output_file_pat).sort
+    output_files = Dir.glob(output_file_pat).sort_by { |file_name| file_name.split(".")[1].to_i }
 
     if input_files.empty? || output_files.empty?
       return [Run::STATUS_ERROR, "No tests"]
