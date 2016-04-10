@@ -1,0 +1,10 @@
+---
+- hosts: all
+  sudo: no
+
+  vars:
+    app_root: /home/grader/applications/grader
+    app_name: codemarathon_grader
+
+  roles:
+    - backup
