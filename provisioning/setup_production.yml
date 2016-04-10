@@ -37,3 +37,5 @@
 # Copy/link MOE sandbox from sandboxes/isolate to ~/moe_sandbox/run/bin/isolate
 
 # Start/restart upstart in a more clever way, make it more robust.
+
+# Need to set up the grader_root dir, so that the grader stores there sets and runs
