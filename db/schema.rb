@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150702075844) do
+ActiveRecord::Schema.define(version: 20160410164355) do
 
   create_table "api_keys", force: true do |t|
     t.integer  "user_id"
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 20150702075844) do
     t.string   "checker"
     t.string   "task_type",    default: "iofiles"
     t.text     "wrapper_code"
+    t.string   "checker_lang"
   end
 
   create_table "user_invites", force: true do |t|

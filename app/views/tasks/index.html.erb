@@ -7,6 +7,7 @@
       <th>Name</th>
       <th>Type</th>
       <th>Checker</th>
+      <th>Checker lang</th>
       <th>Description</th>
     </tr>
     <% @tasks.each do |task| %>
@@ -15,6 +16,7 @@
         <td><%= link_to task.name, task_path(task) %></td>
         <td><%= task.task_type %></td>
         <td><%= task.checker.present? ? task.checker : 'Default' %></td>
+        <td><%= task.checker_lang %></td>
         <td>
           <div class="modal fade" id="task-description-<%= task.id %>" tabindex="-1" role="dialog" aria-labelledby="task-description-<%= task.id %>-label">
             <div class="modal-dialog modal-lg" role="document">

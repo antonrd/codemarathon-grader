@@ -48,7 +48,7 @@ class UpdateChecker
 
           if checker_path.present?
             update_run(Run::STATUS_SUCCESS, "New checker set")
-            run.task.update_attribute(:checker, checker_path)
+            run.task.update_attributes(checker: checker_path, checker_lang: data["lang"])
           else
             update_run(Run::STATUS_CE, "Compilation error")
           end

@@ -12,4 +12,6 @@ class Task < ActiveRecord::Base
   belongs_to :user
 
   validates :task_type, inclusion: { in: TASK_TYPES }
+  validates :checker_lang, presence: true,
+    unless: Proc.new { |task| task.checker.blank? }
 end
