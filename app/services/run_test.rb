@@ -174,22 +174,35 @@ class RunTest
 
   def check_output(run, output_file, answer_file, input_file)
     puts "Checking output..."
+    correct_output = false
     if run.task.checker
       verbose_system "#{checker_exectutable(run.task)} #{input_file} #{answer_file} #{output_file}"
+      correct_output = ($?.exitstatus != 0)
     else
-      checker = "ruby " + Rails.root.join("lib/execs/diff.rb").to_s
-      verbose_system "#{checker} #{answer_file} #{output_file}"
+      if config.value(:diff_tool) == "diff"
+        checker = "ruby " + Rails.root.join("lib/execs/diff.rb").to_s
+        verbose_system "#{checker} #{answer_file} #{output_file}"
+        correct_output = ($?.exitstatus != 0)
+      else
+        correct_output = default_diff_outputs(answer_file, output_file)
+      end
     end
 
-    if $?.exitstatus != 0
-      Run::TEST_OUTCOME_WRONG_ANSWER
-    else
+    if correct_output
+      puts "Output OK"
       Run::TEST_OUTCOME_OK
+    else
+      puts "Output WA"
+      Run::TEST_OUTCOME_WRONG_ANSWER
     end
   end
 
   def checker_exectutable task
     exec_checker_config_key = "exec_#{ task.checker_lang }_checker"
     ["#{ config.value(exec_checker_config_key) }", task.checker].join(" ")
+  end
+
+  def default_diff_outputs answer_file, output_file
+    DiffOutputs.new(answer_file, output_file).call
   end
 end

@@ -21,6 +21,10 @@ production:
   sync_to: sets
   # Directory within the Docker container where programs are run and is mapped to the directory on the host
   sandbox_dir: /sandbox
+  # Tool to use for comparing output files when there is no checker
+  # default - built in tool ignoring whitespace at end of lines and at end of file
+  # diff - calls the diff utility with --strip-trailing-cr
+  diff_tool: default
 
   # Filename for executable programs
   file_basename: program
