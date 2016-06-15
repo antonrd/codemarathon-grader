@@ -19,6 +19,12 @@ class Run < ActiveRecord::Base
     TEST_OUTCOME_WRONG_ANSWER = 'wa'
     TEST_OUTCOME_OK = 'ok'
     TEST_OUTCOME_GRADER_ERROR = 'ge'
+
+    RUN_TEST_BLOCK_REGEX = /====== BEGIN RUN TEST ======(.*?)====== END RUN TEST ======/m
+    EXECUTION_BLOCK_REGEX = /====== BEGIN EXECUTION ======(.*?)====== END EXECUTION ======/m
+    STATS_BLOCK_REGEX = /====== BEGIN STATS ======(.*?)====== END STATS ======/m
+    STATUS_BLOCK_REGEX = /====== BEGIN STATUS ======(.*?)====== END STATUS ======/m
+    COMPILATION_BLOCK_REGEX = /====== BEGIN COMPILATION ======(.*?)====== END COMPILATION ======/m
   end
 
   include Constants
@@ -43,5 +49,64 @@ class Run < ActiveRecord::Base
 
   def is_grading_run?
     self.code == CODE_RUN_TASK
+  end
+
+  def description
+    @description ||= compute_description
+  end
+
+  private
+
+  def compute_description
+    result = {
+      status: 0,
+      message: "Run #{ id } details",
+      run_status: status,
+      run_message: message,
+      compilation: compilation_log,
+      run_log: log,
+      test_cases: test_cases_description
+    }
+  end
+
+  def compilation_log
+    if log.present?
+      match = log.match(COMPILATION_BLOCK_REGEX)
+      return unless match
+      match[1].strip
+    end
+  end
+
+  def test_cases_description
+    if log.present?
+      log.scan(RUN_TEST_BLOCK_REGEX).map { |t| test_case_description(t.first) }
+    end
+  end
+
+  def test_case_description test_case_log
+    {
+      status: test_case_status(test_case_log),
+      execution: test_case_execution(test_case_log),
+    }.merge(used_resources_description(test_case_log.match(
+      STATS_BLOCK_REGEX)[1].strip))
+  end
+
+  def test_case_status test_case_log
+    match = test_case_log.match(STATUS_BLOCK_REGEX)
+    return unless match
+    match[1].strip
+  end
+
+  def test_case_execution test_case_log
+    match = test_case_log.match(EXECUTION_BLOCK_REGEX)
+    return unless match
+    match[1].strip
+  end
+
+  def used_resources_description(stats_log)
+    {
+      used_time: stats_log.match(/Used time: ([0-9\.]+)/)[1].strip.to_f,
+      used_memory: stats_log.match(/Used mem: ([0-9]+)/)[1].strip.to_i
+    }
   end
 end

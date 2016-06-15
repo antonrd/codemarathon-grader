@@ -6,4 +6,10 @@ module ShellUtils
     puts "==== Exit status: #{$?.exitstatus} ===="
     res
   end
+
+  def log_block(title)
+    puts "====== BEGIN #{ title } ======"
+    yield
+    puts "====== END #{ title } ======"
+  end
 end

@@ -24,8 +24,13 @@ class RunTest
   attr_reader :config, :run, :input_file, :answer_file, :config_lang
 
   def run_one_test
-    container_id = run_within_docker
-    get_run_status(container_id)
+    run_status = 'n/a'
+    log_block("RUN TEST") do
+      container_id = run_within_docker
+      run_status = get_run_status(container_id)
+    end
+
+    run_status
   end
 
   def run_within_docker
@@ -57,12 +62,15 @@ class RunTest
        \"#{ executable }\"}
 
     puts command
+
     container_id = %x{#{ command }}
-    if container_id.strip.blank?
+
+    if container_id.blank?
       puts "Failed running #{ executable } in a docker container"
     else
-      puts "Running #{ executable } in container #{ container_id }"
+      puts "Executed #{ executable } in container #{ container_id }"
     end
+
     container_id.strip
   end
 
@@ -87,6 +95,10 @@ class RunTest
         result = check_output(run, local_output_file, answer_file, input_file)
       else
         result = Run::TEST_OUTCOME_RUNTIME_ERROR
+    end
+
+    log_block("STATUS") do
+      puts result
     end
 
     result

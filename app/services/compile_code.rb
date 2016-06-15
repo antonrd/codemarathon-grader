@@ -11,9 +11,9 @@ class CompileCode
   end
 
   def call
-    puts "====== BEGIN Source code======="
-    puts source_code
-    puts "====== END Source code======="
+    log_block("SOURCE CODE") do
+      puts source_code
+    end
 
     File.open(full_source_name, "w") do |f|
       f.write(source_code)
@@ -21,9 +21,11 @@ class CompileCode
 
     if config.compiled_language?(language)
       puts "Compiling #{language} ..."
-      config_key = "compile_#{language}"
-      compile_command = @config.value(config_key) % [full_source_name, file_basename]
-      verbose_system compile_command
+      log_block("COMPILATION") do
+        config_key = "compile_#{language}"
+        compile_command = @config.value(config_key) % [full_source_name, file_basename]
+        verbose_system compile_command
+      end
     else
       puts "Writing source code to #{full_source_name} ..."
       File.open(full_source_name, "w") do |f|
