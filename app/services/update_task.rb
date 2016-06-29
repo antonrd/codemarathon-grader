@@ -2,6 +2,7 @@ require 'shell_utils'
 
 class UpdateTask
   include ShellUtils
+  include GraderLogging
 
   LOG_FILE = "grader.log"
 
@@ -16,7 +17,12 @@ class UpdateTask
     RedirectOutput.new(LOG_FILE).call do
       copy_task_files
     end
-    update_run(LOG_FILE)
+
+    if sync_status
+      update_run(Run::STATUS_SUCCESS, "Done", LOG_FILE)
+    else
+      update_run(Run::STATUS_ERROR, $?, LOG_FILE)
+    end
 
   rescue KeyError => e
     puts "Grader failed to retrieve config value: #{e.message}"
@@ -54,17 +60,5 @@ class UpdateTask
 
   def file_patterns
     [config.value(:input_file_pattern), config.value(:output_file_pattern)]
-  end
-
-  def update_run(log_filename)
-    if sync_status
-      run.update_attributes(status: Run::STATUS_SUCCESS,
-                            message: "Done",
-                            log: File.read(log_filename))
-    else
-      run.update_attributes(status: Run::STATUS_ERROR,
-                            message: $?,
-                            log: File.read(log_filename))
-    end
   end
 end
