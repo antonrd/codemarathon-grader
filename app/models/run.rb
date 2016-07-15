@@ -87,8 +87,7 @@ class Run < ActiveRecord::Base
     {
       status: test_case_status(test_case_log),
       execution: test_case_execution(test_case_log),
-    }.merge(used_resources_description(test_case_log.match(
-      STATS_BLOCK_REGEX)[1].strip))
+    }.merge(used_resources_description(test_case_log))
   end
 
   def test_case_status test_case_log
@@ -103,10 +102,19 @@ class Run < ActiveRecord::Base
     match[1].strip
   end
 
-  def used_resources_description(stats_log)
+  def used_resources_description test_case_log
+    used_time = 0
+    user_memory = 0
+
+    if test_case_log.match(STATS_BLOCK_REGEX)
+      stats_log = test_case_log.match(STATS_BLOCK_REGEX)[1].strip
+      used_time = stats_log.match(/Used time: ([0-9\.]+)/)[1].strip.to_f
+      user_memory = stats_log.match(/Used mem: ([0-9]+)/)[1].strip.to_i
+    end
+
     {
-      used_time: stats_log.match(/Used time: ([0-9\.]+)/)[1].strip.to_f,
-      used_memory: stats_log.match(/Used mem: ([0-9]+)/)[1].strip.to_i
+      used_time: used_time,
+      used_memory: user_memory
     }
   end
 end
