@@ -39,16 +39,9 @@ class GradeTask
         run.update_attributes(status: Run::STATUS_RUNNING,
                               message: "Running")
         if config.supported_language?(data["lang"])
-          if CompileCode.new(config, data["source_code"], data["lang"]).call.nil?
+          if CompileCode.new(config, run.task, data).call.nil?
             update_run(Run::STATUS_CE, 'Compilation error')
           else
-            if run.task.task_type == Task::TASK_TYPE_PYUNIT
-              puts "Creating wrapper code for Python unit test ..."
-              File.open("wrapper_code.py", "w") do |f|
-                f.write(run.task.wrapper_code)
-              end
-            end
-
             puts "Running tests..."
             status, message = run_tests(run, data["lang"])
             update_run(status, message)

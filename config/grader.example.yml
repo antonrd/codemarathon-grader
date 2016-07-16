@@ -28,6 +28,10 @@ production:
 
   # Filename for executable programs
   file_basename: program
+
+  # Filename for solution file from user when unit tests are used
+  unit_solution: unit_solution
+
   # Extensions for various source code files
   extension_cpp: cpp
   extension_java: java
@@ -49,9 +53,6 @@ production:
   exec_java: java -Xmx512m program
   exec_python: /usr/bin/python2.7 ./program.py
   exec_ruby: /usr/bin/ruby ./program.rb
-  # Used to run Python unit tests. May be generalized in the future when
-  # unit tests are added for more languages
-  exec_python_unit: /usr/bin/python2.7 ./wrapper_code.py
 
   # Command prefixes to execute checkers written in different languages
   exec_cpp_checker:

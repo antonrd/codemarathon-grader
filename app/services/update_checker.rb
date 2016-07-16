@@ -44,7 +44,7 @@ class UpdateChecker
           run.task.update_attribute(:checker, nil)
           update_run(Run::STATUS_SUCCESS, "Default checker set")
         else
-          checker_path = CompileCode.new(config, data["source_code"], data["lang"], "checker").call
+          checker_path = CompileCode.new(config, nil, data, "checker").call
 
           if checker_path.present?
             update_run(Run::STATUS_SUCCESS, "New checker set")

@@ -34,11 +34,7 @@ class RunTest
   end
 
   def run_within_docker
-    if run.task.task_type == Task::TASK_TYPE_PYUNIT
-      executable = config.value("exec_python_unit")
-    else
-      executable = config.value("exec_#{ config_lang }")
-    end
+    executable = config.value("exec_#{ config_lang }")
 
     memory_limit_bytes = [[run.max_memory_kb, config.value("min_memory_limit_kb")].max, config.value("max_memory_limit_kb")].min * 1024
     time_limit_seconds = [run.max_time_ms, config.value("max_exec_time_ms")].min / 1000.0
