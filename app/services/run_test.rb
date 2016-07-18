@@ -185,7 +185,7 @@ class RunTest
     correct_output = false
     if run.task.checker
       verbose_system "#{checker_exectutable(run.task)} #{input_file} #{answer_file} #{output_file}"
-      correct_output = ($?.exitstatus != 0)
+      correct_output = ($?.exitstatus == 0)
     else
       if config.value(:diff_tool) == "diff"
         checker = "ruby " + Rails.root.join("lib/execs/diff.rb").to_s
