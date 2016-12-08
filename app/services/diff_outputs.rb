@@ -9,16 +9,16 @@ class DiffOutputs
 
     File.readlines(filename1).zip(File.readlines(filename2)).each do |line1, line2|
       line_counter += 1
-      stripped_line1 = line1.nil? ? line1 : line1.strip
-      stripped_line2 = line2.nil? ? line2 : line2.strip
+      stripped_line1 = line1.nil? ? '' : line1.strip
+      stripped_line2 = line2.nil? ? '' : line2.strip
 
       if stripped_line1 != stripped_line2
         unless stripped_line1.blank? && stripped_line2.blank?
           puts "Difference at line #{ line_counter }:"
           puts "=== #{ filename1 }"
-          puts "> #{ line1 }"
+          puts "> #{ stripped_line1[0..100] }"
           puts "=== #{ filename2 }"
-          puts "< #{ line2 }"
+          puts "< #{ stripped_line2[0..100] }"
           return false
         end
       end
