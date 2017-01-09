@@ -2,6 +2,8 @@ FROM ubuntu:14.04
 MAINTAINER Anton Dimitrov <dimitrov.anton@gmail.com>
 RUN useradd -m -d /sandbox -p grader grader && chsh -s /bin/bash grader
 
+RUN apt-get install software-properties-common
+
 RUN sudo add-apt-repository ppa:openjdk-r/ppa
 
 RUN apt-get update && apt-get install -y make python2.7 python3 openjdk-8-jre openjdk-8-jdk g++ zlib1g-dev libssl-dev
