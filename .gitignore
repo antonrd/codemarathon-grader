@@ -17,3 +17,6 @@
 /config/database.yml
 
 .DS_Store
+
+/sample_api_calls
+/sample_files
