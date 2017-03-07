@@ -28,6 +28,7 @@ class RunTest
     log_block("RUN TEST") do
       container_id = run_within_docker
       run_status = get_run_status(container_id)
+      docker_cleanup
     end
 
     run_status
