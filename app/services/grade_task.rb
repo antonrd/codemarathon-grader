@@ -69,7 +69,7 @@ class GradeTask
   def prepare_run_directory
     run_dir = File.join(config.value(:files_root), "sandbox")
     FileUtils.mkdir_p(run_dir)
-    FileUtils.rm(Dir.glob(File.join(run_dir, '*')))
+    FileUtils.rm_rf(Dir.glob(File.join(run_dir, '*')))
     run_dir
   end
 
